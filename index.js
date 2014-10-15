@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var AWS = require('aws-sdk');
 
 AWS.config.update({
@@ -39,6 +40,58 @@ function listTables(callback) {
     });
 }
 
+function copyTable(tableName, itemsReceived, callback) {
+    var ddb = new AWS.DynamoDB(tableName);
+
+    function fetchItems(startKey, limit, itemsReceived, done) {
+        var params = {
+            Limit: limit,
+            ReturnConsumedCapacity: 'NONE',
+            TableName: tableName
+        };
+        if (startKey) {
+            params.ExclusiveStartKey = startKey;
+        }
+        ddb.scan(params, function(err, data) {
+            if (err) {
+                console.log('Error fetching data');
+                console.log(err);
+                process.exit();
+            }
+
+            if( data.Items.length > 0) {
+                itemsReceived(data.Items);
+            }
+
+            if (!data.LastEvaluatedKey || _.keys(data.LastEvaluatedKey).length === 0) {
+                done();
+            } else {
+                fetchItems(data.LastEvaluatedKey, limit, itemsReceived, done);
+            }
+        });
+    }
+
+    ddb.describeTable({ TableName: tableName }, function(err, data) {
+        if (err) {
+            console.log('Error describing table');
+            console.log(err);
+            process.exit();
+        }
+
+        var limit = data.Table.ProvisionedThroughput.ReadCapacityUnits;
+
+        fetchItems(null, limit, itemsReceived, callback);
+    });
+}
+
 listTables(function(err, tables) {
-    console.log(tables);
-})
+    copyTable('member-plans', 
+        function(items) {
+            console.log(items)
+        },
+        function() {
+            console.log('Done copying table');
+        }
+    );
+});
+
