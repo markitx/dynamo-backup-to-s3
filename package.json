@@ -1,0 +1,27 @@
+{
+  "name": "dynamo-backup-to-s3",
+  "version": "0.0.1",
+  "private": "true",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markitx/dynamo-backup-to-s3.git"
+  },
+  "dependencies": {
+    "async": "*",
+    "aws-sdk": "*",
+    "moment": "*",
+    "node-uuid": "*",
+    "s3-streaming-upload": "*",
+    "underscore": "*",
+    "vargs": "*"
+  },
+  "engines": {
+    "node": ">=0.8.8"
+  },
+  "devDependencies": {
+    "mocha": "1.8.x"
+  },
+  "scripts": {
+    "test": "NODE_ENV=test mocha --timeout 120000"
+  }
+}
