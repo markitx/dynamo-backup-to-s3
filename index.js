@@ -1,5 +1,12 @@
 var _ = require('underscore');
 var AWS = require('aws-sdk');
+var moment = require('moment');
+var path = require('path');
+var async = require('async');
+
+var Uploader = require('s3-streaming-upload').Uploader;
+
+var ReadableStream = require('./readable-stream');
 
 AWS.config.update({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -59,7 +66,7 @@ function copyTable(tableName, itemsReceived, callback) {
                 process.exit();
             }
 
-            if( data.Items.length > 0) {
+            if(data.Items.length > 0) {
                 itemsReceived(data.Items);
             }
 
@@ -78,20 +85,67 @@ function copyTable(tableName, itemsReceived, callback) {
             process.exit();
         }
 
-        var limit = data.Table.ProvisionedThroughput.ReadCapacityUnits;
+        var limit = Math.max((data.Table.ProvisionedThroughput.ReadCapacityUnits * .25)|0, 1);
 
         fetchItems(null, limit, itemsReceived, callback);
     });
 }
 
-listTables(function(err, tables) {
-    copyTable('member-plans', 
+function saveTable(tableName, backupPath, callback) {
+    var stream = new ReadableStream();
+
+    var uploader = new Uploader({
+        // credentials to access AWS
+        accessKey:  process.env.AWS_ACCESS_KEY_ID,
+        secretKey:  process.env.AWS_SECRET_ACCESS_KEY,
+        region:     'us-east-1',
+        bucket:     'markitx-backups',
+        objectName: path.join(backupPath, tableName + '.json'),
+        stream:     stream
+    });
+
+    copyTable(tableName,
         function(items) {
-            console.log(items)
+            items.forEach(function(item) {
+                stream.append(JSON.stringify(item));
+                stream.append('\n');
+            });
         },
         function() {
-            console.log('Done copying table');
+            stream.end();
+            callback();
         }
     );
-});
+}
 
+function backupTables(callback) {
+    var now = moment();
+    var backupPath = now.format('DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
+    listTables(function(err, tables) {
+        async.each(tables,
+            function(tableName, done) {
+                console.log('Starting to copy table ' + tableName);
+
+                var startTime = moment();
+                saveTable(tableName, backupPath, function() {
+                    var endTime = moment();
+                    console.log('Done copying table ' + tableName + '. Took ' + endTime.diff(startTime, 'minutes', true).toFixed(2) + ' minutes');
+                    done();
+                });
+            },
+            function() {
+                callback();
+            }
+        );
+    });
+}
+
+module.exports = backupTables;
+
+var runningAsScript = require.main === module;
+
+if (runningAsScript) {
+    backupTables(function() {
+        console.log('Finished backing up DynamoDB');
+    });
+}
