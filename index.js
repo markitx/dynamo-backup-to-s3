@@ -47,7 +47,9 @@ function listTables(callback) {
     });
 }
 
-function copyTable(tableName, itemsReceived, callback) {
+function copyTable(options, callback) {
+    var tableName = options.tableName;
+    var itemsReceived = options.itemsReceived;
     var ddb = new AWS.DynamoDB(tableName);
 
     function fetchItems(startKey, limit, itemsReceived, done) {
@@ -85,13 +87,15 @@ function copyTable(tableName, itemsReceived, callback) {
             process.exit();
         }
 
-        var limit = Math.max((data.Table.ProvisionedThroughput.ReadCapacityUnits * .25)|0, 1);
+
+        var readPercentage = options.readPercentage || .25;
+        var limit = Math.max((data.Table.ProvisionedThroughput.ReadCapacityUnits * readPercentage)|0, 1);
 
         fetchItems(null, limit, itemsReceived, callback);
     });
 }
 
-function saveTable(tableName, backupPath, callback) {
+function saveTable(tableName, backupPath, readPercentage, callback) {
     var stream = new ReadableStream();
 
     var uploader = new Uploader({
@@ -104,13 +108,18 @@ function saveTable(tableName, backupPath, callback) {
         stream:     stream
     });
 
-    copyTable(tableName,
-        function(items) {
+    var copyOptions = {
+        tableName: tableName,
+        itemsReceived: function(items) {
             items.forEach(function(item) {
                 stream.append(JSON.stringify(item));
                 stream.append('\n');
             });
         },
+        readPercentage: readPercentage
+    }
+
+    copyTable(copyOptions,
         function() {
             stream.end();
             callback();
@@ -118,16 +127,24 @@ function saveTable(tableName, backupPath, callback) {
     );
 }
 
-function backupTables(callback) {
+function backupTables(options, callback) {
+    if (callback === undefined) {
+        callback = options;
+        options = undefined;
+    }
     var now = moment();
-    var backupPath = now.format('DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
+    var excludedTables = options.excludedTables || [];
+    var backupPath = options.backupPath || now.format('DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
     listTables(function(err, tables) {
+        var includedTables = options.includedTables || tables;
+        tables = _.difference(tables, excludedTables);
+        tables = _.intersection(tables, includedTables);
         async.each(tables,
             function(tableName, done) {
                 console.log('Starting to copy table ' + tableName);
 
                 var startTime = moment();
-                saveTable(tableName, backupPath, function() {
+                saveTable(tableName, backupPath, options.readPercentage, function() {
                     var endTime = moment();
                     console.log('Done copying table ' + tableName + '. Took ' + endTime.diff(startTime, 'minutes', true).toFixed(2) + ' minutes');
                     done();
@@ -149,3 +166,4 @@ if (runningAsScript) {
         console.log('Finished backing up DynamoDB');
     });
 }
+
