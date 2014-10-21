@@ -161,16 +161,9 @@ module.exports = backupTables;
 
 var runningAsScript = require.main === module;
 
-// if (runningAsScript) {
-//     backupTables(function() {
-//         console.log('Finished backing up DynamoDB');
-//     });
-// }
+if (runningAsScript) {
+    backupTables(function() {
+        console.log('Finished backing up DynamoDB');
+    });
+}
 
-backupTables({
-    includedTables: ['api-logs', 'part-price-request-audit', 'part-price-request-processed', 'price-metrics'],
-    readPercentage: 1,
-    backupPath: '2014-10-20-14-36-20'
-}, function() {
-    console.log('Finished backing up DynamoDB');
-})
