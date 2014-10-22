@@ -134,7 +134,7 @@ function backupTables(options, callback) {
     }
     var now = moment();
     var excludedTables = options.excludedTables || [];
-    var backupPath = options.backupPath || now.format('DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
+    var backupPath = options.backupPath || ('DynamoDB-backup-' + now.format('YYYY-MM-DD-HH-mm-ss'))
     listTables(function(err, tables) {
         var includedTables = options.includedTables || tables;
         tables = _.difference(tables, excludedTables);
