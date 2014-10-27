@@ -9,11 +9,11 @@
   "dependencies": {
     "async": "*",
     "aws-sdk": "*",
+    "minimist": "*",
     "moment": "*",
     "node-uuid": "*",
     "s3-streaming-upload": "*",
-    "underscore": "*",
-    "vargs": "*"
+    "underscore": "*"
   },
   "engines": {
     "node": ">=0.8.8"
