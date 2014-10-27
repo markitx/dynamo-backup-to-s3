@@ -6,7 +6,7 @@ var async = require('async');
 
 var Uploader = require('s3-streaming-upload').Uploader;
 
-var ReadableStream = require('./readable-stream');
+var ReadableStream = require('./lib/readable-stream');
 
 AWS.config.update({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
