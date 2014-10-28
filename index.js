@@ -11,8 +11,7 @@ var DynamoBackup = require('./lib/dynamo-backup');
 var runningAsScript = require.main === module;
 
 if (runningAsScript) {
-    var dynamoBackup = new DynamoBackup({ bucket: 'markitx-backups', stopOnFailure: true, readPercentage: .5,
-    includedTables: ['development-asset-projects'] });
+    var dynamoBackup = new DynamoBackup({ bucket: 'markitx-backups-test', stopOnFailure: true, readPercentage: .5, includedTables: ['development-asset-projects'] });
     dynamoBackup.on('error', function(data) {
         console.log('Error backing up ' + data.tableName);
         console.log(data.error);
