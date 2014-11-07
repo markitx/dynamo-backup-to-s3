@@ -7,13 +7,13 @@
     "url": "https://github.com/markitx/dynamo-backup-to-s3.git"
   },
   "dependencies": {
-    "async": "*",
-    "aws-sdk": "*",
-    "minimist": "*",
-    "moment": "*",
-    "node-uuid": "*",
-    "s3-streaming-upload": "*",
-    "underscore": "*"
+    "async": "~0.9.x",
+    "aws-sdk": "~2.0.x",
+    "minimist": "~1.1.x",
+    "moment": "~2.8.x",
+    "node-uuid": "~1.4.x",
+    "s3-streaming-upload": "~0.1.x",
+    "underscore": "~1.7.x"
   },
   "engines": {
     "node": ">=0.8.8"
