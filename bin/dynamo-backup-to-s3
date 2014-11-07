@@ -1,0 +1,70 @@
+#!/usr/bin/env node
+
+var program = require('commander'),
+    fs = require('fs'),
+    moment = require('moment'),
+    DynamoBackup = require('../')
+
+// options
+
+function list(val) {
+  return val.split(',');
+}
+
+function parseBool(val) {
+    return val == 'true';
+}
+
+program
+    .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
+    .usage('[options]')
+    .option('-b, --bucket <name>', 'S3 bucket to store backups')
+    .option('-s, --stop-on-failure', 'specify the reporter to use', parseBool, true)
+    .option('-r, --read-percentage <decimal>', 'specific the percentage of Dynamo read capacity to use while backing up. default .25 (25%)', parseFloat, .25)
+    .option('-x, --excluded-tables <list>', 'exclude these tables from backup', list)
+    .option('-i, --included-tables <list>', 'only backup these tables', list)
+    .option('-p, --backup-path <name>', 'backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
+    .option('--aws-key', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
+    .option('--aws-secret', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
+    .option('--aws-region', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
+    .parse(process.argv);
+
+// run program
+
+var runTimes = {};
+
+var dynamoBackup = new DynamoBackup({
+    awsAccessKey: program.awsKey,
+    awsSecretKey: program.awsSecret,
+    awsRegion: program.awsRegion,
+    backupPath: program.backupPath,
+    bucket: program.bucket,
+    excludedTables: program.excludedTables,
+    includedTables: program.includedTables,
+    readPercentage: program.readPercentage,
+    stopOnFailure: program.stopOnFailure
+});
+
+dynamoBackup.on('error', function(data) {
+    console.log('Error backing up ' + data.tableName);
+    console.log(data.error);
+    if (program.stopOnFailure) {
+        process.exit(-1);
+    }
+});
+
+dynamoBackup.on('start-backup', function(tableName) {
+    runTimes[tableName] = moment();
+    console.log('Starting to copy table ' + tableName);
+});
+
+dynamoBackup.on('end-backup', function(tableName) {
+    var endTime = moment();
+    var startTime = runTimes[tableName];
+    console.log('Done copying table ' + tableName + '. Took ' + endTime.diff(startTime, 'minutes', true).toFixed(2) + ' minutes');
+});
+
+dynamoBackup.backupAllTables(function() {
+    console.log('Finished backing up DynamoDB');
+    process.exit(0);
+});
