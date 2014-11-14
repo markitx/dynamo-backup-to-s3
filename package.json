@@ -15,6 +15,9 @@
     "s3",
     "stream"
   ],
+  "bin": {
+    "dynamo-backup-to-s3": "./bin/dynamo-backup-to-s3"
+  },
   "dependencies": {
     "async": "~0.9.x",
     "aws-sdk": "~2.0.x",
