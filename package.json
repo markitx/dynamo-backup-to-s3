@@ -7,6 +7,14 @@
     "type": "git",
     "url": "https://github.com/markitx/dynamo-backup-to-s3.git"
   },
+  "keywords": [
+    "dynamo",
+    "dynamodb",
+    "backup",
+    "streaming",
+    "s3",
+    "stream"
+  ],
   "dependencies": {
     "async": "~0.9.x",
     "aws-sdk": "~2.0.x",
