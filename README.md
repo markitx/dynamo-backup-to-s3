@@ -2,9 +2,9 @@
 
 ## Stream DynamoDB backups to S3.
 
-dynamo-backup-to-s3 is a utility to stream DynamoDB data to S3.  Since the data is streamed directly from DynamoDB to S3 it is suitable for copying large tables directly to S3.  dynamo-backup-to-s3 copies tables in parallel and allows you to adjust the read capacity it consumes.
+dynamo-backup-to-s3 is a utility to stream DynamoDB data to S3.  Since the data is streamed directly from DynamoDB to S3 it is suitable for copying large tables directly. Tables are copied in parallel.
 
-dynamo-backup-to-s3 can be run as a command line script or as an npm module.
+Can be run as a command line script or as an npm module.
 
 # Command line usage
 
