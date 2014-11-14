@@ -1,7 +1,8 @@
 {
   "name": "dynamo-backup-to-s3",
   "version": "0.1.2",
-  "private": "true",
+  "author": "Dylan Lingelbach (https://github.com/dylanlingelbach)",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/markitx/dynamo-backup-to-s3.git"
@@ -16,6 +17,9 @@
   },
   "engines": {
     "node": ">=0.8.8"
+  },
+  "bugs": {
+    "url": "https://github.com/markitx/dynamo-backup-to-s3/issues"
   },
   "devDependencies": {
     "mocha": "1.8.x"
