@@ -130,12 +130,6 @@ Backups all tables in the given region while respecting the `excludedTables` and
 __Arguments__
 
 * `callback(err)` - callback which is called when all backups are complete, or an error occurs and `stopOnFailure` is true
-* `iterator(item, callback)` - A function to apply to each item in `arr`.
-  The iterator is passed a `callback(err)` which must be called once it has 
-  completed. If no error has occurred, the `callback` should be run without 
-  arguments or with an explicit `null` argument.
-* `callback(err)` - A callback which is called when all `iterator` functions
-  have finished, or an error occurs.
 
 ### backupTable
 
