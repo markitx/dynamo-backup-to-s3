@@ -114,8 +114,8 @@ Raised when the backup of a table is finished
 
 __Example__
 ```
-backup.on('start-backup', function(tableName) {
-    console.log('Starting to copy table ' + tableName);
+backup.on('end-backup', function(tableName) {
+    console.log('Done copying table ' + tableName);
 });
 ```
 
