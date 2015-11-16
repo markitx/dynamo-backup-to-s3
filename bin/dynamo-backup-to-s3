@@ -24,6 +24,7 @@ program
     .option('-x, --excluded-tables <list>', 'exclude these tables from backup', list)
     .option('-i, --included-tables <list>', 'only backup these tables', list)
     .option('-p, --backup-path <name>', 'backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
+    .option('-e, --base64-encode-binary', 'encode binary fields in base64 before exporting')
     .option('--aws-key', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
     .option('--aws-region', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
@@ -42,7 +43,8 @@ var dynamoBackup = new DynamoBackup({
     excludedTables: program.excludedTables,
     includedTables: program.includedTables,
     readPercentage: program.readPercentage,
-    stopOnFailure: program.stopOnFailure
+    stopOnFailure: program.stopOnFailure,
+    base64Binary: program.base64EncodeBinary
 });
 
 dynamoBackup.on('error', function(data) {
