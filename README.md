@@ -21,6 +21,7 @@ Can be run as a command line script or as an npm module.
     -x, --excluded-tables <list>     exclude these tables from backup
     -i, --included-tables <list>     only backup these tables
     -p, --backup-path <name>         backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss
+    -e, --base64-encode-binary       if passed, encode binary fields in base64 before exporting
     --aws-key                        AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret                     AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region                     AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
@@ -38,6 +39,7 @@ var backup = new DynamoBackup({
     readPercentage: .5,
     bucket: 'my-backups',
     stopOnFailure: true,
+    base64Binary: true,
     awsAccessKey: /* AWS access key */,
     awsSecretKey: /* AWS secret key */,
     awsSecretKey: /* AWS region */
@@ -77,7 +79,8 @@ var options = {
     awsAccessKey:   /* AWS access key */,
     awsSecretKey:   /* AWS secret key */,
     awsSecretKey:   /* AWS region */,
-    backupPath:     /* folder to save backups in.  default: 'DynamoDB-backup-YYYY-MM-DD-HH-mm-ss'
+    backupPath:     /* folder to save backups in.  default: 'DynamoDB-backup-YYYY-MM-DD-HH-mm-ss',
+    base64Binary:   /* whether or not to base64 encode binary data before saving to JSON */
 };
 
 var backup = new DynamoBackup(options);
