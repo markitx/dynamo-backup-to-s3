@@ -19,10 +19,10 @@
     "dynamo-backup-to-s3": "./bin/dynamo-backup-to-s3"
   },
   "dependencies": {
-    "underscore": "~1.7.x"
     "async": "^1.5.0",
     "aws-sdk": "^2.2.21",
     "commander": "^2.9.0",
+    "lodash": "^3.10.1",
     "moment": "^2.10.6",
     "s3-streaming-upload": "^0.2.1"
   },
