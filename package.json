@@ -19,21 +19,22 @@
     "dynamo-backup-to-s3": "./bin/dynamo-backup-to-s3"
   },
   "dependencies": {
-    "async": "~0.9.x",
-    "aws-sdk": "~2.0.x",
-    "commander": "~2.5.x",
-    "moment": "~2.8.x",
-    "s3-streaming-upload": "~0.1.x",
-    "underscore": "~1.7.x"
+    "async": "^1.5.0",
+    "aws-sdk": "^2.2.21",
+    "commander": "^2.9.0",
+    "lodash": "^3.10.1",
+    "moment": "^2.10.6",
+    "moment-range": "^2.0.3",
+    "s3-streaming-upload": "^0.2.1"
   },
   "engines": {
-    "node": ">=0.8.8"
+    "node": ">=0.10.0"
   },
   "bugs": {
     "url": "https://github.com/markitx/dynamo-backup-to-s3/issues"
   },
   "devDependencies": {
-    "mocha": "1.8.x"
+    "mocha": "^2.3.4"
   },
   "scripts": {
     "test": "NODE_ENV=test mocha --timeout 120000"
