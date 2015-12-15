@@ -42,7 +42,7 @@ var backup = new DynamoBackup({
     base64Binary: true,
     awsAccessKey: /* AWS access key */,
     awsSecretKey: /* AWS secret key */,
-    awsSecretKey: /* AWS region */
+    awsRegion: /* AWS region */
 });
 
 backup.on('error', function(data) {
@@ -78,7 +78,7 @@ var options = {
     stopOnFailure:  /* whether or not to continue backing up if a single table fails to back up */,
     awsAccessKey:   /* AWS access key */,
     awsSecretKey:   /* AWS secret key */,
-    awsSecretKey:   /* AWS region */,
+    awsRegion:   /* AWS region */,
     backupPath:     /* folder to save backups in.  default: 'DynamoDB-backup-YYYY-MM-DD-HH-mm-ss',
     base64Binary:   /* whether or not to base64 encode binary data before saving to JSON */
 };
