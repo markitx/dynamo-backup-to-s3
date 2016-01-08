@@ -21,8 +21,7 @@ program
     .option('-b, --bucket <name>', 'S3 bucket to store backups')
     .option('-s, --stop-on-failure', 'specify the reporter to use', parseBool, true)
     .option('-r, --read-percentage <decimal>', 'specific the percentage of Dynamo read capacity to use while backing up. default .25 (25%)', parseFloat, .25)
-    .option('-x, --excluded-tables <list>', 'exclude these tables from backup', list)
-    .option('-i, --included-tables <list>', 'only backup these tables', list)
+    .option('-t, --tables <list>', 'specify tables to back up. supports globs. defaults to "*" (all tables)', list)
     .option('-p, --backup-path <name>', 'backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
     .option('-e, --base64-encode-binary', 'encode binary fields in base64 before exporting')
     .option('-d, --save-data-pipeline-format', 'save in format compatible with the AWS Data Pipeline import. Default to false (save as exported by DynamoDb)')
@@ -41,8 +40,7 @@ var dynamoBackup = new DynamoBackup({
     awsRegion: program.awsRegion,
     backupPath: program.backupPath,
     bucket: program.bucket,
-    excludedTables: program.excludedTables,
-    includedTables: program.includedTables,
+    tables: program.tables,
     readPercentage: program.readPercentage,
     stopOnFailure: program.stopOnFailure,
     base64Binary: program.base64EncodeBinary,
