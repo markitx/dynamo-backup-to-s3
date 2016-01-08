@@ -18,8 +18,7 @@ Can be run as a command line script or as an npm module.
     -b, --bucket <name>              S3 bucket to store backups
     -s, --stop-on-failure            specify the reporter to use
     -r, --read-percentage <decimal>  specific the percentage of Dynamo read capacity to use while backing up. default .25 (25%)
-    -x, --excluded-tables <list>     exclude these tables from backup
-    -i, --included-tables <list>     only backup these tables
+    -t, --tables <list>              specify tables to back up. supports globs. defaults to "*" (all tables)
     -p, --backup-path <name>         backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss
     -e, --base64-encode-binary       if passed, encode binary fields in base64 before exporting
     -d, --save-datapipeline-format   save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb)
@@ -36,7 +35,7 @@ Can be run as a command line script or as an npm module.
 var DynamoBackup = require('dynamo-backup-to-s3');
 
 var backup = new DynamoBackup({
-    excludedTables: ['development-table1', 'development-table2'],
+    tables: ['my-app-*', '!my-app-dev-*'],
     readPercentage: .5,
     bucket: 'my-backups',
     stopOnFailure: true,
@@ -72,15 +71,14 @@ backup.backupAllTables(function() {
 
 ```
 var options = {
-    excludedTables: /* tables to exclude from backup */,
-    includedTables: /* only back up these tables */
+    tables:         /* tables to backup. default: ['*'] (all tables) */,
     readPercentage: /* only consume this much capacity.  expressed as a decimal (i.e. .5 means use 50% of table read capacity).  default: .25 */,
     bucket:         /* bucket to upload the backup to */,
     stopOnFailure:  /* whether or not to continue backing up if a single table fails to back up */,
     saveDataPipelineFormat   /* save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb) */,
     awsAccessKey:   /* AWS access key */,
     awsSecretKey:   /* AWS secret key */,
-    awsRegion:   /* AWS region */,
+    awsRegion:      /* AWS region */,
     backupPath:     /* folder to save backups in.  default: 'DynamoDB-backup-YYYY-MM-DD-HH-mm-ss',
     base64Binary:   /* whether or not to base64 encode binary data before saving to JSON */
 };
@@ -130,7 +128,7 @@ backup.on('end-backup', function(tableName) {
 
 ### backupAllTables
 
-Backups all tables in the given region while respecting the `excludedTables` and `includedTables` options
+Backups all tables in the given region while respecting the glob patterns specified in `tables`.
 
 __Arguments__
 
