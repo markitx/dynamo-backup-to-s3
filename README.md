@@ -22,6 +22,7 @@ Can be run as a command line script or as an npm module.
     -i, --included-tables <list>     only backup these tables
     -p, --backup-path <name>         backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss
     -e, --base64-encode-binary       if passed, encode binary fields in base64 before exporting
+    -d, --save-datapipeline-format   save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb)
     --aws-key                        AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret                     AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region                     AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
@@ -76,6 +77,7 @@ var options = {
     readPercentage: /* only consume this much capacity.  expressed as a decimal (i.e. .5 means use 50% of table read capacity).  default: .25 */,
     bucket:         /* bucket to upload the backup to */,
     stopOnFailure:  /* whether or not to continue backing up if a single table fails to back up */,
+    saveDataPipelineFormat   /* save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb) */,
     awsAccessKey:   /* AWS access key */,
     awsSecretKey:   /* AWS secret key */,
     awsRegion:   /* AWS region */,
