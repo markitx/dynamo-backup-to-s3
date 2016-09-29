@@ -51,12 +51,12 @@ dynamoRestore.on('backup-downloaded', function() {
 
 dynamoRestore.on('chunks-ready', function() {
     var time = runTimes.chunksCreated = moment();
-    console.log('Chunks created in %s.', time.diff(runTimes.finishDownload, 'seconds', true).toFixed(2));
+    console.log('Chunks created in %s seconds.', time.diff(runTimes.finishDownload, 'seconds', true).toFixed(2));
 });
 
 dynamoRestore.run(function() {
 	var time = moment();
-	console.log('Process completed in %s.', time.diff(runTimes.start, 'minutes', true).toFixed(2));
+	console.log('Done! Process completed in %s minutes.', time.diff(runTimes.start, 'minutes', true).toFixed(2));
 	process.exit(0);
 });
 
