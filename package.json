@@ -3,6 +3,9 @@
   "version": "0.4.1",
   "author": "Dylan Lingelbach (https://github.com/dylanlingelbach)",
   "license": "MIT",
+  "contributors": [
+    "Steven de Salas (https://github.com/sdesalas)"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/markitx/dynamo-backup-to-s3.git"

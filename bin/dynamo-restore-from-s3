@@ -1,0 +1,63 @@
+#!/usr/bin/env node
+
+var program = require('commander'),
+    fs = require('fs'),
+    moment = require('moment'),
+    DynamoRestore = require('../').DynamoRestore;
+
+
+program
+    .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
+    .usage('[options]')
+    .option('--debug', 'Run on debug mode')
+    .option('-s, --source [path]', 'The full S3 path to a JSON backup file. Required.')
+    .option('-d, --destination [name]', 'The name of the Dynamo Table to restore to. Required.')
+    .option('-t, --threads <count>', 'Number of concurrent threads to use. Defaults to 10.')
+    .option('-pk, --partitionkey [columnname]', 'Name of Primary Partition Key. Will try determine from backup if not available.')
+    .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
+    .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
+    .option('--aws-region <region>', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
+    .parse(process.argv);
+
+// Display help if needed
+if (!program.source || !program.destination) {
+  program.outputHelp();
+  process.exit(-1);
+  return;
+}
+
+var runTimes = {
+	start: moment()
+};
+
+var dynamoRestore = new DynamoRestore({
+	debug: program.debug,
+	source: program.source,
+	destination: program.destination,
+	threads: program.threads,
+	partitionkey: program.partitionkey
+});
+
+dynamoRestore.on('error', function(data) {
+    console.log('Error restoring ' + data.fileName);
+    console.log(data.error);
+    process.exit(-1);
+});
+
+dynamoRestore.on('backup-downloaded', function() {
+	var time = runTimes.finishDownload = moment();
+    console.log('Backup downloaded in %s minutes.', time.diff(runTimes.start, 'minutes', true).toFixed(2));
+});
+
+dynamoRestore.on('chunks-ready', function() {
+    var time = runTimes.chunksCreated = moment();
+    console.log('Chunks created in %s.', time.diff(runTimes.finishDownload, 'seconds', true).toFixed(2));
+});
+
+dynamoRestore.run(function() {
+	var time = moment();
+	console.log('Process completed in %s.', time.diff(runTimes.start, 'minutes', true).toFixed(2));
+	process.exit(0);
+});
+
+
