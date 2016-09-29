@@ -11,8 +11,8 @@ program
     .usage('[options]')
     .option('--debug', 'Run on debug mode')
     .option('-s, --source [path]', 'The full S3 path to a JSON backup file. Required.')
-    .option('-d, --destination [name]', 'The name of the Dynamo Table to restore to. Required.')
-    .option('-t, --threads <count>', 'Number of concurrent threads to use. Defaults to 10.')
+    .option('-t, --table [name]', 'The name of the Dynamo Table to restore to. Required.')
+    .option('-c, --concurrency <requestcount>', 'Number of concurrent requests to run in paralell. Defaults to 25.')
     .option('-pk, --partitionkey [columnname]', 'Name of Primary Partition Key. Will try determine from backup if not available.')
     .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
@@ -20,7 +20,7 @@ program
     .parse(process.argv);
 
 // Display help if needed
-if (!program.source || !program.destination) {
+if (!program.source || !program.table) {
   program.outputHelp();
   process.exit(-1);
   return;
@@ -30,33 +30,62 @@ var runTimes = {
 	start: moment()
 };
 
+// Initialize
 var dynamoRestore = new DynamoRestore({
 	debug: program.debug,
 	source: program.source,
-	destination: program.destination,
-	threads: program.threads,
-	partitionkey: program.partitionkey
+	table: program.table,
+	concurrency: program.concurrency,
+	partitionkey: program.partitionkey,
+    awsKey: program.awsKey,
+    awsSecret: program.awsSecret,
+    awsRegion: program.awsRegion
 });
 
-dynamoRestore.on('error', function(data) {
-    console.log('Error restoring ' + data.fileName);
-    console.log(data.error);
+function translate(contentLength) {
+    var kb = contentLength / 1024,
+        mb = kb / 1024,
+        gb = mb / 1024;
+    return gb > 1 ? gb.toFixed(2) + ' Gb' : 
+            (mb > 1 ? mb.toFixed(2) + 'Mb' :
+                    kb.toFixed(2) + 'Kb');  
+}
+
+// Define events
+dynamoRestore.on('error', function(message) {
+    console.log(message);
     process.exit(-1);
 });
 
-dynamoRestore.on('backup-downloaded', function() {
+dynamoRestore.on('start-download', function(streamMeta) {
+    var time = runTimes.startDownload = moment();
+    console.log('Starting download. %s remaining...', translate(streamMeta.ContentLength));
+});
+
+dynamoRestore.on('finish-download', function() {
 	var time = runTimes.finishDownload = moment();
-    console.log('Backup downloaded in %s minutes.', time.diff(runTimes.start, 'minutes', true).toFixed(2));
+    console.log('Backup downloaded in %s minutes %s seconds. Processing remaining batches.. ', time.diff(runTimes.start, 'minutes'), time.diff(runTimes.start, 'seconds'));
 });
 
-dynamoRestore.on('chunks-ready', function() {
-    var time = runTimes.chunksCreated = moment();
-    console.log('Chunks created in %s seconds.', time.diff(runTimes.finishDownload, 'seconds', true).toFixed(2));
+dynamoRestore.on('send-batch', function(remaining, streamMeta) {
+    //if (runTimes.finishDownload) {
+        console.log('Batch sent, %s remaining to process...', translate(streamMeta.ContentLength));
+        if (remaining === 0) {
+            runTimes.finishBatches = moment();
+        }
+    //}
 });
 
+dynamoRestore.on('finish-batch', function(remainingRequests) {
+    if (runTimes.finishBatches) {
+        console.log('%d requests left to complete...', remainingRequests);
+    }
+});
+
+// Start Process
 dynamoRestore.run(function() {
-	var time = moment();
-	console.log('Done! Process completed in %s minutes.', time.diff(runTimes.start, 'minutes', true).toFixed(2));
+	var time = runTimes.end = moment();
+	console.log('Done! Process completed in %s minutes %s seconds.', time.diff(runTimes.start, 'minutes'), time.diff(runTimes.start, 'seconds'));
 	process.exit(0);
 });
 
