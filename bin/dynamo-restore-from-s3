@@ -56,9 +56,9 @@ function translate(contentLength) {
     var kb = contentLength / 1024,
         mb = kb / 1024,
         gb = mb / 1024;
-    return gb > 1 ? gb.toFixed(2) + ' Gb' : 
-            (mb > 1 ? mb.toFixed(2) + 'Mb' :
-                    kb.toFixed(2) + 'Kb');  
+    return gb > 1 ? gb.toFixed(0) + ' Gb' : 
+            (mb > 1 ? mb.toFixed(0) + 'Mb' :
+                    kb.toFixed(0) + 'Kb');  
 }
 
 // Define events
@@ -73,23 +73,11 @@ dynamoRestore.on('start-download', function(streamMeta) {
 });
 
 dynamoRestore.on('finish-download', function() {
-	var time = runTimes.finishDownload = moment();
-    console.log('Backup downloaded in %s minutes %s seconds. Processing remaining batches.. ', time.diff(runTimes.start, 'minutes'), time.diff(runTimes.start, 'seconds'));
+    console.log('Finished downloading from S3. Processing remaining batches.. ');
 });
 
-dynamoRestore.on('send-batch', function(remaining, streamMeta) {
-    //if (runTimes.finishDownload) {
-        console.log('Batch sent, %s remaining to process...', translate(streamMeta.ContentLength));
-        if (remaining === 0) {
-            runTimes.finishBatches = moment();
-        }
-    //}
-});
-
-dynamoRestore.on('finish-batch', function(remainingRequests) {
-    if (runTimes.finishBatches) {
-        console.log('%d requests left to complete...', remainingRequests);
-    }
+dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
+    console.log('Batch sent. %d concurent requests. %s remaining to download...', requests, translate(streamMeta.ContentLength));
 });
 
 // Start Process
