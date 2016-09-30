@@ -8,15 +8,18 @@ var program = require('commander'),
 
 program
     .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
-    .usage('[options]')
-    .option('--debug', 'Run on debug mode')
-    .option('-s, --source [path]', 'The full S3 path to a JSON backup file. Required.')
-    .option('-t, --table [name]', 'The name of the Dynamo Table to restore to. Required.')
+    .usage('[options] -s "s3://mybucket/path/to/file.json" -t "new-dynamodb-table"')
+    .option('-s, --source [path]', 'Full S3 path to a JSON backup file (Required)')
+    .option('-t, --table [name]', 'Name of the Dynamo Table to restore to (Required)')
     .option('-c, --concurrency <requestcount>', 'Number of concurrent requests to run in paralell. Defaults to 25.')
     .option('-pk, --partitionkey [columnname]', 'Name of Primary Partition Key. Will try determine from backup if not available.')
+    .option('-sk, --sortkey [columnname]', 'Name of Secondary Sort Key. Ignored unless --partitionkey is provided.')
+    .option('-rc, --readcapacity <units>', 'Read Units for new table (when finished). Default is 5.')
+    .option('-wc, --writecapacity <units>', 'Write Units for new table (when finished). Default is 5.')
     .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
     .option('--aws-region <region>', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
+    .option('--debug', 'Runs on debug mode')
     .parse(process.argv);
 
 // Display help if needed
@@ -32,14 +35,21 @@ var runTimes = {
 
 // Initialize
 var dynamoRestore = new DynamoRestore({
-	debug: program.debug,
+    // Main settings
 	source: program.source,
 	table: program.table,
 	concurrency: program.concurrency,
+    // New table properties
 	partitionkey: program.partitionkey,
+    sortkey: program.sortkey,
+    readcapacity: program.readcapacity,
+    writecapacity: program.writecapacity,
+    // Authentication
     awsKey: program.awsKey,
     awsSecret: program.awsSecret,
-    awsRegion: program.awsRegion
+    awsRegion: program.awsRegion,
+    // Development
+    debug: program.debug
 });
 
 function translate(contentLength) {
