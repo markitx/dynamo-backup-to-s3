@@ -2,7 +2,6 @@
 
 var program = require('commander'),
     fs = require('fs'),
-    moment = require('moment'),
     DynamoRestore = require('../').DynamoRestore;
 
 
@@ -30,7 +29,7 @@ if (!program.source || !program.table) {
 }
 
 var runTimes = {
-	start: moment()
+	start: new Date().getTime()
 };
 
 // Initialize
@@ -68,18 +67,21 @@ dynamoRestore.on('error', function(message) {
 });
 
 dynamoRestore.on('start-download', function(streamMeta) {
-    var time = runTimes.startDownload = moment();
+    var time = runTimes.startDownload = new Date().getTime();
     console.log('Starting download. %s remaining...', translate(streamMeta.ContentLength));
 });
 
 dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
-    console.log('Batch sent. %s remaining to download...', translate(streamMeta.RemainingLength));
+    console.log('Batch sent. %d in flight. %s remaining to download...', requests, translate(streamMeta.RemainingLength));
 });
 
 // Start Process
 dynamoRestore.run(function() {
-	var time = runTimes.end = moment();
-	console.log('Done! Process completed in %s minutes %s seconds.', time.diff(runTimes.start, 'minutes'), time.diff(runTimes.start, 'seconds'));
+	var time = runTimes.end = new Date().getTime(),
+        diff = time - runTimes.start,
+        minutes = Math.floor(diff / (1000 * 60)),
+        seconds = Math.floor((diff % 1000 * 60) / 1000);
+	console.log('Done! Process completed in %s minutes %s seconds.', minutes, seconds);
 	process.exit(0);
 });
 
