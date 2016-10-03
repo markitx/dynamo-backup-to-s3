@@ -69,7 +69,7 @@ dynamoRestore.on('error', function(message) {
 
 dynamoRestore.on('start-download', function(streamMeta) {
     var time = runTimes.startDownload = moment();
-    console.log('Starting download. %s remaining...', translate(streamMeta.RemainingLength));
+    console.log('Starting download. %s remaining...', translate(streamMeta.ContentLength));
 });
 
 dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
