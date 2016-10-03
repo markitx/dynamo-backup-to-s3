@@ -56,8 +56,8 @@ function translate(contentLength) {
     var kb = contentLength / 1024,
         mb = kb / 1024,
         gb = mb / 1024;
-    return gb > 1 ? gb.toFixed(0) + ' Gb' : 
-            (mb > 1 ? mb.toFixed(0) + 'Mb' :
+    return gb > 5 ? gb.toFixed(0) + ' Gb' : 
+            (mb > 5 ? mb.toFixed(0) + 'Mb' :
                     kb.toFixed(0) + 'Kb');  
 }
 
@@ -69,15 +69,11 @@ dynamoRestore.on('error', function(message) {
 
 dynamoRestore.on('start-download', function(streamMeta) {
     var time = runTimes.startDownload = moment();
-    console.log('Starting download. %s remaining...', translate(streamMeta.ContentLength));
-});
-
-dynamoRestore.on('finish-download', function() {
-    console.log('Finished downloading from S3. Processing remaining batches.. ');
+    console.log('Starting download. %s remaining...', translate(streamMeta.RemainingLength));
 });
 
 dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
-    console.log('Batch sent. %d concurent requests. %s remaining to download...', requests, translate(streamMeta.ContentLength));
+    console.log('Batch sent. %s remaining to download...', translate(streamMeta.RemainingLength));
 });
 
 // Start Process
