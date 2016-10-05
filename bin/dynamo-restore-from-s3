@@ -2,7 +2,7 @@
 
 var program = require('commander'),
     fs = require('fs'),
-    DynamoRestore = require('../').DynamoRestore;
+    DynamoRestore = require('../').Restore;
 
 
 program
