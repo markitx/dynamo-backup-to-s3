@@ -180,6 +180,35 @@ Can be run as a command line script or as an npm module.
     --aws-key <key>                   AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret <secret>             AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region <region>             AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
-    --debug                           Runs on debug mode
+```
+
+# npm module usage
+
+## Quick Example
+
+```
+var DynamoRestore = require('dynamo-backup-to-s3').Restore;
+
+var restore = new DynamoRestore({
+    source: 's3://my-backups/DynamoDB-backup-2016-09-28-15-36-40/acme-customers-prod.json',
+    destination: 'acme-customers-dev',
+    awsAccessKey: /* AWS access key */,
+    awsSecretKey: /* AWS secret key */,
+    awsRegion: /* AWS region */
+});
+
+restore.on('error', function(data) {
+    console.log('Error backing up ' + data.table);
+    console.log(data.err);
+});
+
+dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
+    console.log('Batch sent. %d in flight. %d Mb remaining to download...', requests, streamMeta.RemainingLength / (1024 * 1024));
+});
+
+restore.run(function() {
+    console.log('Finished restoring up DynamoDB');
+});
+
 ```
 
