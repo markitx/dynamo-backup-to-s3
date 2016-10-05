@@ -175,7 +175,7 @@ Can be run as a command line script or as an npm module.
     -s, --source [path]               Full S3 path to a JSON backup file (Required)
     -t, --table [name]                Name of the Dynamo Table to restore to (Required)
     -c, --concurrency <requestcount>  Number of concurrent requests to run in paralell. Defaults to 25.
-    -pk, --partitionkey [columnname]  Name of Primary Partition Key. Will try determine from backup if not available.
+    -pk, --partitionkey [columnname]  Name of Primary Partition Key. If not provided will try determine from backup.
     -sk, --sortkey [columnname]       Name of Secondary Sort Key. Ignored unless --partitionkey is provided.
     -rc, --readcapacity <units>       Read Units for new table (when finished). Default is 5.
     -wc, --writecapacity <units>      Write Units for new table (when finished). Default is 5.
