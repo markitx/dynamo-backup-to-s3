@@ -157,7 +157,9 @@ __Arguments__
 
 ## Restore S3 backups back to Dynamo.
 
-`dynamo-restore-from-s3` is a utility that restores backups in S3 back to dynamo. It streams data down from S3 and throttles the download speed to match the rate of batch writes to Dynamo so it is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance to minimise network latency and provide best results.
+`dynamo-restore-from-s3` is a utility that restores backups in S3 back to dynamo. It streams data down from S3 and throttles the download speed to match the rate of batch writes to Dynamo. 
+
+It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency. 
 
 Can be run as a command line script or as an npm module. 
 
@@ -177,7 +179,7 @@ Can be run as a command line script or as an npm module.
     -sk, --sortkey [columnname]       Name of Secondary Sort Key. Ignored unless --partitionkey is provided.
     -rc, --readcapacity <units>       Read Units for new table (when finished). Default is 5.
     -wc, --writecapacity <units>      Write Units for new table (when finished). Default is 5.
-    -sf, --stop-on-failure            Stops the restore process when the same batch fails to restore 3 times.           
+    -sf, --stop-on-failure            Stop the process when the same batch fails to restore 3 times. Defaults to false.        
     --aws-key <key>                   AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret <secret>             AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region <region>             AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
