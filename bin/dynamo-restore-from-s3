@@ -4,17 +4,17 @@ var program = require('commander'),
     fs = require('fs'),
     DynamoRestore = require('../').Restore;
 
-
 program
     .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
     .usage('[options] -s "s3://mybucket/path/to/file.json" -t "new-dynamodb-table"')
     .option('-s, --source [path]', 'Full S3 path to a JSON backup file (Required)')
     .option('-t, --table [name]', 'Name of the Dynamo Table to restore to (Required)')
     .option('-c, --concurrency <requestcount>', 'Number of concurrent requests to run in paralell. Defaults to 25.')
-    .option('-pk, --partitionkey [columnname]', 'Name of Primary Partition Key. Will try determine from backup if not available.')
+    .option('-pk, --partitionkey [columnname]', 'Name of Primary Partition Key. If not provided will try determine from backup.')
     .option('-sk, --sortkey [columnname]', 'Name of Secondary Sort Key. Ignored unless --partitionkey is provided.')
     .option('-rc, --readcapacity <units>', 'Read Units for new table (when finished). Default is 5.')
     .option('-wc, --writecapacity <units>', 'Write Units for new table (when finished). Default is 5.')
+    .option('-sf, --stop-on-failure', 'Stop process when the same batch fails to restore 3 times. Defaults to false.', true)
     .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
     .option('--aws-region <region>', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
@@ -37,6 +37,7 @@ var dynamoRestore = new DynamoRestore({
 	source: program.source,
 	table: program.table,
 	concurrency: program.concurrency,
+    stopOnFailure: !!program.stopOnFailure,
     // New table properties
 	partitionkey: program.partitionkey,
     sortkey: program.sortkey,
