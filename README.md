@@ -179,7 +179,7 @@ Can be run as a command line script or as an npm module.
     -sk, --sortkey [columnname]       Name of Secondary Sort Key. Ignored unless --partitionkey is provided.
     -rc, --readcapacity <units>       Read Units for new table (when finished). Default is 5.
     -wc, --writecapacity <units>      Write Units for new table (when finished). Default is 5.
-    -sf, --stop-on-failure            Stop the process when the same batch fails to restore 3 times. Defaults to false.        
+    -sf, --stop-on-failure            Stop process when the same batch fails to restore 3 times. Defaults to false.        
     --aws-key <key>                   AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret <secret>             AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region <region>             AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
