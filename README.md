@@ -1,5 +1,7 @@
 # dynamo-backup-to-s3
 
+![dynamo to s3](https://raw.githubusercontent.com/sdesalas/dynamo-backup-to-s3/master/img/dynamo-backup-to-s3.png)
+
 ## Stream DynamoDB backups to S3.
 
 dynamo-backup-to-s3 is a utility to stream DynamoDB data to S3.  Since the data is streamed directly from DynamoDB to S3 it is suitable for copying large tables directly. Tables are copied in parallel.
@@ -150,6 +152,8 @@ __Arguments__
 * `callback(err)` - A callback which is called when the table has finished backing up, or an error occurs
 
 # dynamo-restore-from-s3
+
+![s3 to dynamo](https://raw.githubusercontent.com/sdesalas/dynamo-backup-to-s3/master/img/dynamo-restore-from-s3.png)
 
 ## Restore S3 backups back to Dynamo.
 
