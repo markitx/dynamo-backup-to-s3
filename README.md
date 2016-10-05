@@ -148,3 +148,34 @@ __Arguments__
   completed. If no error has occurred, the `callback` should be run without 
   arguments or with an explicit `null` argument.
 * `callback(err)` - A callback which is called when the table has finished backing up, or an error occurs
+
+# dynamo-restore-from-s3
+
+## Restore S3 backups back to Dynamo.
+
+`dynamo-restore-from-s3` is a utility that restores backups in S3 back to dynamo.
+
+Can be run as a command line script or as an npm module.
+
+# Command line usage
+
+```
+  Usage: dynamo-restore-from-s3 [options] -s "s3://mybucket/path/to/file.json" -t "new-dynamodb-table"
+
+  Options:
+
+    -h, --help                        output usage information
+    -V, --version                     output the version number
+    -s, --source [path]               Full S3 path to a JSON backup file (Required)
+    -t, --table [name]                Name of the Dynamo Table to restore to (Required)
+    -c, --concurrency <requestcount>  Number of concurrent requests to run in paralell. Defaults to 25.
+    -pk, --partitionkey [columnname]  Name of Primary Partition Key. Will try determine from backup if not available.
+    -sk, --sortkey [columnname]       Name of Secondary Sort Key. Ignored unless --partitionkey is provided.
+    -rc, --readcapacity <units>       Read Units for new table (when finished). Default is 5.
+    -wc, --writecapacity <units>      Write Units for new table (when finished). Default is 5.
+    --aws-key <key>                   AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
+    --aws-secret <secret>             AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
+    --aws-region <region>             AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
+    --debug                           Runs on debug mode
+```
+
