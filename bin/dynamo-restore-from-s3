@@ -18,7 +18,6 @@ program
     .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
     .option('--aws-region <region>', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
-    .option('--debug', 'Runs on debug mode')
     .parse(process.argv);
 
 // Display help if needed
@@ -47,8 +46,6 @@ var dynamoRestore = new DynamoRestore({
     awsKey: program.awsKey,
     awsSecret: program.awsSecret,
     awsRegion: program.awsRegion,
-    // Development
-    debug: program.debug
 });
 
 function translate(contentLength) {
