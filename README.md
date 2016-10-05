@@ -191,7 +191,11 @@ var DynamoRestore = require('dynamo-backup-to-s3').Restore;
 
 var restore = new DynamoRestore({
     source: 's3://my-backups/DynamoDB-backup-2016-09-28-15-36-40/acme-customers-prod.json',
-    destination: 'acme-customers-dev',
+    table: 'acme-customers-dev',
+    concurrency: 50,
+    partitionkey: 'customerId',
+    readcapacity: 1,
+    writecapacity: 1,
     awsAccessKey: /* AWS access key */,
     awsSecretKey: /* AWS secret key */,
     awsRegion: /* AWS region */
@@ -207,7 +211,7 @@ dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
 });
 
 restore.run(function() {
-    console.log('Finished restoring up DynamoDB');
+    console.log('Finished restoring DynamoDB table');
 });
 
 ```
