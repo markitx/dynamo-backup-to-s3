@@ -192,7 +192,7 @@ Can be run as a command line script or as an npm module.
 ```
 var DynamoRestore = require('dynamo-backup-to-s3').Restore;
 
-var restore = new DynamoRestore({
+var dynamoRestore = new DynamoRestore({
     source: 's3://my-backups/DynamoDB-backup-2016-09-28-15-36-40/acme-customers-prod.json',
     table: 'acme-customers-dev',
     concurrency: 50,
@@ -204,7 +204,7 @@ var restore = new DynamoRestore({
     awsRegion: /* AWS region */
 });
 
-restore.on('error', function(data) {
+dynamoRestore.on('error', function(data) {
     console.log('Error backing up ' + data.table);
     console.log(data.err);
 });
@@ -213,7 +213,7 @@ dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
     console.log('Batch sent. %d in flight. %d Mb remaining to download...', requests, streamMeta.RemainingLength / (1024 * 1024));
 });
 
-restore.run(function() {
+dynamoRestore.run(function() {
     console.log('Finished restoring DynamoDB table');
 });
 
