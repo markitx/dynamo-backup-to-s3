@@ -25,6 +25,7 @@ program
     .option('-i, --included-tables <list>', 'only backup these tables', list)
     .option('-p, --backup-path <name>', 'backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
     .option('-e, --base64-encode-binary', 'encode binary fields in base64 before exporting')
+    .option('-f, --save-schema', 'save table schema. Default to false')
     .option('-d, --save-data-pipeline-format', 'save in format compatible with the AWS Data Pipeline import. Default to false (save as exported by DynamoDb)')
     .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
@@ -46,7 +47,8 @@ var dynamoBackup = new DynamoBackup({
     readPercentage: program.readPercentage,
     stopOnFailure: program.stopOnFailure,
     base64Binary: program.base64EncodeBinary,
-    saveDataPipelineFormat: program.saveDataPipelineFormat
+    saveDataPipelineFormat: program.saveDataPipelineFormat,
+    saveSchema: program.saveSchema
 });
 
 dynamoBackup.on('error', function(data) {
