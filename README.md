@@ -1,5 +1,7 @@
 # dynamo-backup-to-s3
 
+![dynamo to s3](https://raw.githubusercontent.com/sdesalas/dynamo-backup-to-s3/master/img/dynamo-backup-to-s3.png)
+
 ## Stream DynamoDB backups to S3.
 
 dynamo-backup-to-s3 is a utility to stream DynamoDB data to S3.  Since the data is streamed directly from DynamoDB to S3 it is suitable for copying large tables directly. Tables are copied in parallel.
@@ -23,6 +25,7 @@ Can be run as a command line script or as an npm module.
     -p, --backup-path <name>         backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss
     -e, --base64-encode-binary       if passed, encode binary fields in base64 before exporting
     -d, --save-datapipeline-format   save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb)
+    -f, --save-schema                save table schema. Default to false
     --aws-key                        AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret                     AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region                     AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
@@ -41,6 +44,7 @@ var backup = new DynamoBackup({
     bucket: 'my-backups',
     stopOnFailure: true,
     base64Binary: true,
+    saveSchema: true,
     awsAccessKey: /* AWS access key */,
     awsSecretKey: /* AWS secret key */,
     awsRegion: /* AWS region */
@@ -78,9 +82,10 @@ var options = {
     bucket:         /* bucket to upload the backup to */,
     stopOnFailure:  /* whether or not to continue backing up if a single table fails to back up */,
     saveDataPipelineFormat   /* save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb) */,
+    saveSchema:     /* save table schema */,
     awsAccessKey:   /* AWS access key */,
     awsSecretKey:   /* AWS secret key */,
-    awsRegion:   /* AWS region */,
+    awsRegion:      /* AWS region */,
     backupPath:     /* folder to save backups in.  default: 'DynamoDB-backup-YYYY-MM-DD-HH-mm-ss',
     base64Binary:   /* whether or not to base64 encode binary data before saving to JSON */
 };
@@ -144,7 +149,77 @@ __Arguments__
 
 * `tableName` - name of the table to backup
 * `backupPath` - (optional) the path to use for the backup.
-  The iterator is passed a `callback(err)` which must be called once it has 
-  completed. If no error has occurred, the `callback` should be run without 
+  The iterator is passed a `callback(err)` which must be called once it has
+  completed. If no error has occurred, the `callback` should be run without
   arguments or with an explicit `null` argument.
 * `callback(err)` - A callback which is called when the table has finished backing up, or an error occurs
+
+# dynamo-restore-from-s3
+
+![s3 to dynamo](https://raw.githubusercontent.com/sdesalas/dynamo-backup-to-s3/master/img/dynamo-restore-from-s3.png)
+
+## Restore S3 backups back to Dynamo.
+
+`dynamo-restore-from-s3` is a utility that restores backups in S3 back to dynamo. It streams data down from S3 and throttles the download speed to match the rate of batch writes to Dynamo.
+
+It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency.
+
+Can be run as a command line script or as an npm module.
+
+# Command line usage
+
+```
+  Usage: dynamo-restore-from-s3 [options] -s "s3://mybucket/path/to/file.json" -t "new-dynamodb-table"
+
+  Options:
+
+    -h, --help                        output usage information
+    -V, --version                     output the version number
+    -s, --source [path]               Full S3 path to a JSON backup file (Required)
+    -f, --restoreSchema [path]        Full S3 path to a JSON schema backup file
+    -t, --table [name]                Name of the Dynamo Table to restore to (Required)
+    -c, --concurrency <requestcount>  Number of concurrent requests to run in paralell. Defaults to 25.
+    -pk, --partitionkey [columnname]  Name of Primary Partition Key. If not provided will try determine from backup.
+    -sk, --sortkey [columnname]       Name of Secondary Sort Key. Ignored unless --partitionkey is provided.
+    -rc, --readcapacity <units>       Read Units for new table (when finished). Default is 5.
+    -wc, --writecapacity <units>      Write Units for new table (when finished). Default is 5.
+    -sf, --stop-on-failure            Stop process when the same batch fails to restore 3 times. Defaults to false.
+    --aws-key <key>                   AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
+    --aws-secret <secret>             AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
+    --aws-region <region>             AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
+```
+
+# npm module usage
+
+## Quick Example
+
+```
+var DynamoRestore = require('dynamo-backup-to-s3').Restore;
+
+var dynamoRestore = new DynamoRestore({
+    source: 's3://my-backups/DynamoDB-backup-2016-09-28-15-36-40/acme-customers-prod.json',
+    table: 'acme-customers-dev',
+    concurrency: 50,
+    partitionkey: 'customerId',
+    readcapacity: 1,
+    writecapacity: 1,
+    awsAccessKey: /* AWS access key */,
+    awsSecretKey: /* AWS secret key */,
+    awsRegion: /* AWS region */
+});
+
+dynamoRestore.on('error', function(data) {
+    console.log('Error backing up ' + data.table);
+    console.log(data.err);
+});
+
+dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
+    console.log('Batch sent. %d in flight. %d Mb remaining to download...', requests, streamMeta.RemainingLength / (1024 * 1024));
+});
+
+dynamoRestore.run(function() {
+    console.log('Finished restoring DynamoDB table');
+});
+
+```
+
