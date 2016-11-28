@@ -9,7 +9,7 @@ program
     .usage('[options] -s "s3://mybucket/path/to/file.json" -t "new-dynamodb-table"')
     .option('-s, --source [path]', 'Full S3 path to a JSON backup file (Required)')
     .option('-t, --table [name]', 'Name of the Dynamo Table to restore to (Required)')
-    .option('-c, --concurrency <requestcount>', 'Number of concurrent requests to run in paralell. Defaults to 25.')
+    .option('-c, --concurrency <requestcount>', 'Number of concurrent requests & dynamo capacity units. Defaults to 50.')
     .option('-pk, --partitionkey [columnname]', 'Name of Primary Partition Key. If not provided will try determine from backup.')
     .option('-sk, --sortkey [columnname]', 'Name of Secondary Sort Key. Ignored unless --partitionkey is provided.')
     .option('-rc, --readcapacity <units>', 'Read Units for new table (when finished). Default is 5.')
