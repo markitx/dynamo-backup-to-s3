@@ -204,9 +204,13 @@ var dynamoRestore = new DynamoRestore({
     awsRegion: /* AWS region */
 });
 
-dynamoRestore.on('error', function(data) {
-    console.log('Error backing up ' + data.table);
-    console.log(data.err);
+dynamoRestore.on('error', function(message) {
+    console.log(message);
+    process.exit(-1);
+});
+
+dynamoRestore.on('warning', function(message) {
+    console.log(message);
 });
 
 dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
@@ -219,3 +223,89 @@ dynamoRestore.run(function() {
 
 ```
 
+### Constructor
+
+```
+var options = {
+    source: /* path to json file in s3 bucket, should start with s3://bucketname/... */,
+    table: /* name of dynamo table, created on the fly, MUST NOT EXIST */,
+    concurrency: /* number of concurrent requests (and dynamo write capacity units) */,
+    partitionkey: /* name of partition key column*/,
+    sortkey: /* name of secondary (sort) key column */ ,
+    readcapacity: /* number of read capacity units */,
+    writecapacity: /* number of write capacity units (when restore finishes) */,
+    stopOnFailure: /* true/false should a single failed batch stop the whole restore job? */,
+    awsAccessKey: /* AWS access key */,
+    awsSecretKey: /* AWS secret key */,
+    awsRegion: /* AWS region */
+};
+
+var restore = new DynamoBackup.Restore(options);
+```
+
+## Events
+
+### error
+
+Raised when there is a fatal error restoring a table
+
+__Example__
+```
+restore.on('error', function() {
+    console.log('Error!! + ' + message);
+});
+```
+
+### warning
+
+Raised when there is a warning restoring a table. Normally this will be a failed batch.
+
+__Example__
+```
+restore.on('warning', function() {
+    console.log('Warning!! + ' + message);
+});
+```
+
+### send-batch
+
+Raised whenever a batch is sent to Dynamo. Useful for tracking progress.
+
+__Example__
+```
+restore.on('send-batch', function(batches, requests, streamMeta) {
+    console.log('Batch Sent');
+    console.log('Num cached batches: ', batches); 
+    console.log('Num requests in flight: ', requests);
+    console.log('Stream metadata:, JSON.stringify(streamMeta));
+});
+```
+### finish
+Raised when the restore process is finished.
+
+__Example__
+```
+restore.on('finish', function() {
+    console.log('All done!');
+});
+```
+
+## Functions
+
+### run
+
+Restores table with options as defined in constructor.
+
+__Arguments__
+
+* `callback(err)` - callback to execute when restore job is complete. First argument exists only if there is an error.
+
+__Example__
+```
+restore.run(function(error) {
+    if (error) {
+        return console.log(error);
+    }
+    console.log('All done!');
+});
+```
