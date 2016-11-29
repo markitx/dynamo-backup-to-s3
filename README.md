@@ -159,7 +159,7 @@ __Arguments__
 
 `dynamo-restore-from-s3` is a utility that restores backups in S3 back to dynamo. It streams data down from S3 and throttles the download speed to match the rate of batch writes to Dynamo. 
 
-It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency. 
+It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency, this way you sould be able to achive restore speeds of around 10min per GB (using concurrency of 500).
 
 Can be run as a command line script or as an npm module. 
 
@@ -174,12 +174,12 @@ Can be run as a command line script or as an npm module.
     -V, --version                     output the version number
     -s, --source [path]               Full S3 path to a JSON backup file (Required)
     -t, --table [name]                Name of the Dynamo Table to restore to (Required)
-    -c, --concurrency <requestcount>  Number of concurrent requests to run in paralell. Defaults to 25.
+    -c, --concurrency <requestcount>  Number of concurrent requests & dynamo capacity units. Defaults to 50.
     -pk, --partitionkey [columnname]  Name of Primary Partition Key. If not provided will try determine from backup.
     -sk, --sortkey [columnname]       Name of Secondary Sort Key. Ignored unless --partitionkey is provided.
     -rc, --readcapacity <units>       Read Units for new table (when finished). Default is 5.
     -wc, --writecapacity <units>      Write Units for new table (when finished). Default is 5.
-    -sf, --stop-on-failure            Stop process when the same batch fails to restore 3 times. Defaults to false.        
+    -sf, --stop-on-failure            Stop process when the same batch fails to restore 3 times. Defaults to false.
     --aws-key <key>                   AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret <secret>             AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region <region>             AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
