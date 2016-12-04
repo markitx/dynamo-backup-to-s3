@@ -174,7 +174,7 @@ Can be run as a command line script or as an npm module.
     -V, --version                     output the version number
     -s, --source [path]               Full S3 path to a JSON backup file (Required)
     -t, --table [name]                Name of the Dynamo Table to restore to (Required)
-    -c, --concurrency <requestcount>  Number of concurrent requests & dynamo capacity units. Defaults to 50.
+    -c, --concurrency <requestcount>  Number of concurrent requests & dynamo capacity units. Defaults to 200.
     -pk, --partitionkey [columnname]  Name of Primary Partition Key. If not provided will try determine from backup.
     -sk, --sortkey [columnname]       Name of Secondary Sort Key. Ignored unless --partitionkey is provided.
     -rc, --readcapacity <units>       Read Units for new table (when finished). Default is 5.
@@ -195,7 +195,7 @@ var DynamoRestore = require('dynamo-backup-to-s3').Restore;
 var restore = new DynamoRestore({
     source: 's3://my-backups/DynamoDB-backup-2016-09-28-15-36-40/acme-customers-prod.json',
     table: 'acme-customers-dev',
-    concurrency: 50,
+    concurrency: 200,
     partitionkey: 'customerId',
     readcapacity: 1,
     writecapacity: 1,
