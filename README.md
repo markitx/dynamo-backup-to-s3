@@ -195,7 +195,7 @@ var DynamoRestore = require('dynamo-backup-to-s3').Restore;
 var restore = new DynamoRestore({
     source: 's3://my-backups/DynamoDB-backup-2016-09-28-15-36-40/acme-customers-prod.json',
     table: 'acme-customers-dev',
-    concurrency: 50,
+    concurrency: 200,
     partitionkey: 'customerId',
     readcapacity: 1,
     writecapacity: 1,
