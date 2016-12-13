@@ -159,7 +159,7 @@ __Arguments__
 
 `dynamo-restore-from-s3` is a utility that restores backups in S3 back to dynamo. It streams data down from S3 and throttles the download speed to match the rate of batch writes to Dynamo. 
 
-It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency, this way you sould be able to achive restore speeds of around 10min per GB (using concurrency of 500).
+It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency, this should yield restore speeds of around 15min per GB.
 
 Can be run as a command line script or as an npm module. 
 
@@ -195,7 +195,7 @@ var DynamoRestore = require('dynamo-backup-to-s3').Restore;
 var restore = new DynamoRestore({
     source: 's3://my-backups/DynamoDB-backup-2016-09-28-15-36-40/acme-customers-prod.json',
     table: 'acme-customers-dev',
-    concurrency: 200,
+    concurrency: 200, // for large restores use 1 unit per MB as a rule of thumb (ie 1000 for 1GB restore)
     partitionkey: 'customerId',
     readcapacity: 1,
     writecapacity: 1,
