@@ -161,6 +161,8 @@ __Arguments__
 
 It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency, this should yield restore speeds of around 15min per GB.
 
+Use `--overwrite` if the table already exists. Otherwise it will attempt to generate table on the fly.
+
 Can be run as a command line script or as an npm module. 
 
 # Command line usage
@@ -174,15 +176,52 @@ Can be run as a command line script or as an npm module.
     -V, --version                     output the version number
     -s, --source [path]               Full S3 path to a JSON backup file (Required)
     -t, --table [name]                Name of the Dynamo Table to restore to (Required)
+    -o, --overwrite                   Table already exists, skip auto-create. Default is false.
     -c, --concurrency <requestcount>  Number of concurrent requests & dynamo capacity units. Defaults to 200.
     -pk, --partitionkey [columnname]  Name of Primary Partition Key. If not provided will try determine from backup.
     -sk, --sortkey [columnname]       Name of Secondary Sort Key. Ignored unless --partitionkey is provided.
     -rc, --readcapacity <units>       Read Units for new table (when finished). Default is 5.
-    -wc, --writecapacity <units>      Write Units for new table (when finished). Default is 5.
-    -sf, --stop-on-failure            Stop process when the same batch fails to restore 3 times. Defaults to false.
+    -wc, --writecapacity <units>      Write Units for new table (when finished). Default is --concurrency.
+    -sf, --stop-on-failure            Stop process when the same batch fails to restore multiple times. Defaults to false.
     --aws-key <key>                   AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret <secret>             AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region <region>             AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
+```
+
+## Examples
+
+```
+
+    # Restore over existing table (cmd.exe).
+    > node ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json --overwrite 
+
+    # Restore over existing table (shell).
+    $ ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json --overwrite 
+
+    # Restore over existing table, 1000 concurrent requests. Stop if any batch fails 1000 times.
+    $ ./bin/dynamo-restore-from-s3 -t acme-customers -c 1000 -s s3://my-backups/acme-customers.json --overwrite -sf
+
+    # Restore over existing table, 1000 concurrent requests. When finished, set read capacity to 50 and write capacity to 10 (both needed).
+    $ ./bin/dynamo-restore-from-s3 -t acme-customers -c 1000 -s s3://my-backups/acme-customers.json --overwrite --readcapacity 50 --writecapacity 10
+
+    # Auto-generate table (determine PK from backup). 
+    $ ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json
+
+    # Auto-generate table with partition and sort key.
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -s s3://my-backups/acme-orders.json -pk customerId -sk createDate 
+
+    # Auto-generate table, defined PK. Concurrency 2000 (~ 2GB backup).
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -pk orderId -c 2000 -s s3://my-backups/acme-orders.json 
+
+    # Auto-generate table. 2000 write units during restore. When finished set 50 write units and 100 write units (both needed).
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 2000 -s s3://my-backups/acme-orders.json --readcapacity 100 --writecapacity 50
+
+    # Auto-generate table. Concurrency 50 (10 MB backup or less).
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 50 -s s3://my-backups/acme-orders.json 
+
+    # Auto-generate table. Concurrency 50. Stop process if any batch fails 50 times.
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 50 -sf -s s3://my-backups/acme-orders.json 
+
 ```
 
 # npm module usage
@@ -195,10 +234,8 @@ var DynamoRestore = require('dynamo-backup-to-s3').Restore;
 var restore = new DynamoRestore({
     source: 's3://my-backups/DynamoDB-backup-2016-09-28-15-36-40/acme-customers-prod.json',
     table: 'acme-customers-dev',
+    overwrite: true,
     concurrency: 200, // for large restores use 1 unit per MB as a rule of thumb (ie 1000 for 1GB restore)
-    partitionkey: 'customerId',
-    readcapacity: 1,
-    writecapacity: 1,
     awsAccessKey: /* AWS access key */,
     awsSecretKey: /* AWS secret key */,
     awsRegion: /* AWS region */
@@ -228,11 +265,12 @@ restore.run(function() {
 ```
 var options = {
     source: /* path to json file in s3 bucket, should start with s3://bucketname/... */,
-    table: /* name of dynamo table, created on the fly, MUST NOT EXIST */,
+    table: /* name of dynamo table, will be created on the fly unless overwritten */,
+    overwrite: /* true/false if table already exits (defaults to false) */
     concurrency: /* number of concurrent requests (and dynamo write capacity units) */,
-    partitionkey: /* name of partition key column*/,
+    partitionkey: /* name of partition key column */,
     sortkey: /* name of secondary (sort) key column */ ,
-    readcapacity: /* number of read capacity units */,
+    readcapacity: /* number of read capacity units (when restore finishes) */,
     writecapacity: /* number of write capacity units (when restore finishes) */,
     stopOnFailure: /* true/false should a single failed batch stop the whole restore job? */,
     awsAccessKey: /* AWS access key */,
