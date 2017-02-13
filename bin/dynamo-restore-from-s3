@@ -1,0 +1,90 @@
+#!/usr/bin/env node
+
+var program = require('commander'),
+    fs = require('fs'),
+    DynamoRestore = require('../').Restore;
+
+program
+    .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
+    .usage('[options] -s "s3://mybucket/path/to/file.json" -t "new-dynamodb-table"')
+    .option('-s, --source [path]', 'Full S3 path to a JSON backup file (Required)')
+    .option('-t, --table [name]', 'Name of the Dynamo Table to restore to (Required)')
+    .option('-o, --overwrite', 'Table already exists, skip auto-create. Default is false.')
+    .option('-c, --concurrency <requestcount>', 'Number of concurrent requests & dynamo capacity units. Defaults to 200.')
+    .option('-pk, --partitionkey [columnname]', 'Name of Primary Partition Key. If not provided will try determine from backup.')
+    .option('-sk, --sortkey [columnname]', 'Name of Secondary Sort Key. Ignored unless --partitionkey is provided.')
+    .option('-rc, --readcapacity <units>', 'Read Units for new table (when finished). Default is 5.')
+    .option('-wc, --writecapacity <units>', 'Write Units for new table (when finished). Default is --concurrency.')
+    .option('-sf, --stop-on-failure', 'Stop process when the same batch fails to restore 3 times. Defaults to false.', true)
+    .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
+    .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
+    .option('--aws-region <region>', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
+    .parse(process.argv);
+
+// Display help if needed
+if (!program.source || !program.table) {
+    program.outputHelp();
+    process.exit(-1);
+    return;
+}
+
+var runTimes = {
+    start: new Date().getTime()
+};
+
+// Initialize
+var dynamoRestore = new DynamoRestore({
+    // Main settings
+    source: program.source,
+    table: program.table,
+    overwrite: !!program.overwrite,
+    concurrency: program.concurrency,
+    stopOnFailure: !!program.stopOnFailure,
+    // New table properties
+    partitionkey: program.partitionkey,
+    sortkey: program.sortkey,
+    readcapacity: program.readcapacity,
+    writecapacity: program.writecapacity,
+    // Authentication
+    awsKey: program.awsKey,
+    awsSecret: program.awsSecret,
+    awsRegion: program.awsRegion,
+});
+
+function translate(contentLength) {
+    var kb = contentLength / 1024,
+        mb = kb / 1024,
+        gb = mb / 1024;
+    return gb > 5 ? gb.toFixed(0) + ' Gb' :
+        (mb > 5 ? mb.toFixed(0) + 'Mb' :
+        kb.toFixed(0) + 'Kb');
+}
+
+// Define events
+dynamoRestore.on('error', function(message) {
+    console.log(message);
+    process.exit(-1);
+});
+
+dynamoRestore.on('warning', function(message) {
+    console.log(message);
+});
+
+dynamoRestore.on('start-download', function(streamMeta) {
+    var time = runTimes.startDownload = new Date().getTime();
+    console.log('Starting download. %s remaining...', translate(streamMeta.ContentLength));
+});
+
+dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
+    console.log('Batch sent. %d in flight. %s remaining to download...', requests, translate(streamMeta.RemainingLength));
+});
+
+// Start Process
+dynamoRestore.run(function() {
+    var time = runTimes.end = new Date().getTime(),
+        diff = time - runTimes.start,
+        minutes = Math.floor(diff / (1000 * 60)),
+        seconds = Math.floor((diff % 1000 * 60) / 1000);
+    console.log('Done! Process completed in %s minutes %s seconds.', minutes, seconds);
+    process.exit(0);
+});

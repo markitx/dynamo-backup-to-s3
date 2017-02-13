@@ -3,7 +3,7 @@
 var program = require('commander'),
     fs = require('fs'),
     moment = require('moment'),
-    DynamoBackup = require('../')
+    DynamoBackup = require('../');
 
 // options
 
