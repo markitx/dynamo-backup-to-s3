@@ -18,8 +18,8 @@
     "s3",
     "stream"
   ],
-  "bin": {
-    "dynamo-backup-to-s3": "./bin/dynamo-backup-to-s3"
+  "directories": {
+    "bin": "./bin"
   },
   "dependencies": {
     "async": "^1.5.0",
