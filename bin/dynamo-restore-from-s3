@@ -11,6 +11,7 @@ program
     .option('-t, --table [name]', 'Name of the Dynamo Table to restore to (Required)')
     .option('-o, --overwrite', 'Table already exists, skip auto-create. Default is false.')
     .option('-c, --concurrency <requestcount>', 'Number of concurrent requests & dynamo capacity units. Defaults to 200.')
+    .option('-ic, --index-concurrency <requestcount>', 'Number of concurrent requests & dynamo capacity units for global secondary indexes. Defaults to 200.')
     .option('-pk, --partitionkey [columnname]', 'Name of Primary Partition Key. If not provided will try determine from backup.')
     .option('-sk, --sortkey [columnname]', 'Name of Secondary Sort Key. Ignored unless --partitionkey is provided.')
     .option('-rc, --readcapacity <units>', 'Read Units for new table (when finished). Default is 5.')
@@ -39,6 +40,7 @@ var dynamoRestore = new DynamoRestore({
     table: program.table,
     overwrite: !!program.overwrite,
     concurrency: program.concurrency,
+    indexConcurrency: program.indexConcurrency,
     stopOnFailure: !!program.stopOnFailure,
     // New table properties
     partitionkey: program.partitionkey,
