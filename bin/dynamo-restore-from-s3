@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-
+var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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';
+var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 var program = require('commander'),
     fs = require('fs'),
     DynamoRestore = require('../').Restore;
@@ -64,6 +65,12 @@ function translate(contentLength) {
 
 // Define events
 dynamoRestore.on('error', function(message) {
+    slack.send(
+        {
+            channel: '#ped_backup_restore',
+            text:'Something went wrong restoring: ' + program.table + '. Message: ' + message
+        }
+    );
     console.log(message);
     process.exit(-1);
 });
@@ -73,6 +80,12 @@ dynamoRestore.on('warning', function(message) {
 });
 
 dynamoRestore.on('start-download', function(streamMeta) {
+    slack.send(
+        {
+            channel: '#ped_backup_restore',
+            text:'Restoring ' + program.table + ' with capacity: ' + program.concurrency  + ' and index capacity: ' + program.indexConcurrency
+        }
+    );
     var time = runTimes.startDownload = new Date().getTime();
     console.log('Starting download. %s remaining...', translate(streamMeta.ContentLength));
 });
@@ -87,6 +100,13 @@ dynamoRestore.run(function() {
         diff = time - runTimes.start,
         minutes = Math.floor(diff / (1000 * 60)),
         seconds = Math.floor((diff % 1000 * 60) / 1000);
+
+    slack.send(
+        {
+            channel: '#ped_backup_restore',
+            text:'Restored ' + program.table + ' returning write capacity to: ' + program.writecapacity + ', read capacity to: ' + program.readcapacity + '. Completed in ' + minutes + ' minutes and ' + seconds + ' seconds.'
+        }
+    );
     console.log('Done! Process completed in %s minutes %s seconds.', minutes, seconds);
     process.exit(0);
 });
