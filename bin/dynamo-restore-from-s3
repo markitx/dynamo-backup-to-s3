@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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';
+var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/T1JC01J20/B56R0998F/' + process.ENV.SLACK_ID;
 var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 var program = require('commander'),
     fs = require('fs'),
@@ -65,14 +65,16 @@ function translate(contentLength) {
 
 // Define events
 dynamoRestore.on('error', function(message) {
-    slack.send(
-        {
-            channel: '#ped_backup_restore',
-            text:'Something went wrong restoring: ' + program.table + '. Message: ' + message
-        }
-    );
+    slack.note({
+        channel: '#ped_backup_restore',
+        text: 'Something went wrong restoring: ' + program.table,
+        fields: {
+            'Error': message,
+        },
+        username: 'Pato'
+    });
     console.log(message);
-    process.exit(-1);
+    setTimeout(function() { process.exit(-1); }, 3000);
 });
 
 dynamoRestore.on('warning', function(message) {
@@ -80,12 +82,11 @@ dynamoRestore.on('warning', function(message) {
 });
 
 dynamoRestore.on('start-download', function(streamMeta) {
-    slack.send(
-        {
-            channel: '#ped_backup_restore',
-            text:'Restoring ' + program.table + ' with capacity: ' + program.concurrency  + ' and index capacity: ' + program.indexConcurrency
-        }
-    );
+    slack.note({
+        channel: '#ped_backup_restore',
+        text: 'Restoring ' + program.table + '. Write capacity set to: ' +  program.concurrency,
+        username: 'Pato'
+    });
     var time = runTimes.startDownload = new Date().getTime();
     console.log('Starting download. %s remaining...', translate(streamMeta.ContentLength));
 });
@@ -101,12 +102,11 @@ dynamoRestore.run(function() {
         minutes = Math.floor(diff / (1000 * 60)),
         seconds = Math.floor((diff % 1000 * 60) / 1000);
 
-    slack.send(
-        {
-            channel: '#ped_backup_restore',
-            text:'Restored ' + program.table + ' returning write capacity to: ' + program.writecapacity + ', read capacity to: ' + program.readcapacity + '. Completed in ' + minutes + ' minutes and ' + seconds + ' seconds.'
-        }
-    );
+    slack.note({
+        channel: '#ped_backup_restore',
+        text: 'Restore completed for ' + program.table + ' in ' + minutes + ' minutes ' + seconds + ' seconds. Write capacity: ' +  program.writecapacity + ', Read capacity: ' + program.writecapacity,
+        username: 'Pato'
+    });
     console.log('Done! Process completed in %s minutes %s seconds.', minutes, seconds);
-    process.exit(0);
+    setTimeout(function() { process.exit(0); }, 3000);
 });
