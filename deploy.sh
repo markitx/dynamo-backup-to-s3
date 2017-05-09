@@ -14,8 +14,8 @@ make_task_def() {
 			\"name\": \"dynamo-backup-to-s3\",
 			\"image\": \"584629324139.dkr.ecr.eu-west-1.amazonaws.com/dynamo-backup-to-s3:latest\",
 			\"essential\": true,
-			\"memory\": 756,
-			\"cpu\": 400,
+			\"memory\": 2000,
+			\"cpu\": 600,
             \"logConfiguration\": {
                 \"logDriver\": \"awslogs\",
                 \"options\": {
