@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/T1JC01J20/B56R0998F/' + process.ENV.SLACK_ID;
+var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/T1JC01J20/B56R0998F/' + process.env.SLACK_ID;
 var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 var program = require('commander'),
     fs = require('fs'),

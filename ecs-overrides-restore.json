@@ -1,0 +1,8 @@
+{
+    "containerOverrides": [
+        {
+            "name": "dynamo-backup-to-s3",
+            "command": ["sh","/home/root/restore.sh"]
+        }
+    ]
+}
