@@ -162,7 +162,7 @@ __Arguments__
 
 It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency, this should yield restore speeds of around 15min per GB.
 
-Use `--overwrite` if the table already exists. Otherwise it will attempt to generate table on the fly.
+Use `--overwrite` if the table already exists. Otherwise it will attempt to generate table on the fly using table.schema.json created on the backup.
 
 Can be run as a command line script or as an npm module. 
 
