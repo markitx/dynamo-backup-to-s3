@@ -14,8 +14,8 @@ make_task_def() {
 			\"name\": \"dynamo-backup-to-s3\",
 			\"image\": \"584629324139.dkr.ecr.eu-west-1.amazonaws.com/dynamo-backup-to-s3:latest\",
 			\"essential\": true,
-			\"memory\": 2000,
-			\"cpu\": 600,
+			\"memory\": 2500,
+			\"cpu\": 800,
             \"logConfiguration\": {
                 \"logDriver\": \"awslogs\",
                 \"options\": {
@@ -23,7 +23,29 @@ make_task_def() {
                     \"awslogs-region\": \"eu-west-1\",
                     \"awslogs-stream-prefix\": \"dynamo-backup-job\"
                 }
-		    }
+		    },
+            \"environment\": [
+                {
+                    \"name\": \"AWS_KEY_BACKUP\",
+                    \"value\":\"$AWS_KEY_BACKUP\"
+                },
+                {
+                    \"name\": \"AWS_SECRET_BACKUP\",
+                    \"value\": \"$AWS_SECRET_BACKUP\"
+                },
+                {
+                    \"name\": \"AWS_KEY_RESTORE\",
+                    \"value\": \"$AWS_KEY_RESTORE\"
+                },
+                {
+                    \"name\": \"AWS_SECRET_RESTORE\",
+                    \"value\": \"$AWS_SECRET_RESTORE\"
+                },
+                {
+                    \"name\": \"SLACK_ID\",
+                    \"value\": \"$SLACK_ID\"
+                }
+            ]
         }
 	]"
 }
