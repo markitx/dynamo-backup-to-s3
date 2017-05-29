@@ -28,18 +28,10 @@
     "lodash": "^3.10.1",
     "moment": "^2.10.6",
     "moment-range": "^2.0.3",
-    "s3-streaming-upload": "^0.2.1"
+    "s3-streaming-upload": "^0.2.1",
+    "stream": "^0.0.2"
   },
   "engines": {
-    "node": ">=0.10.0"
-  },
-  "bugs": {
-    "url": "https://github.com/markitx/dynamo-backup-to-s3/issues"
-  },
-  "devDependencies": {
-    "mocha": "^2.3.4"
-  },
-  "scripts": {
-    "test": "NODE_ENV=test mocha --timeout 120000"
+    "node": ">=6.0.0"
   }
 }
