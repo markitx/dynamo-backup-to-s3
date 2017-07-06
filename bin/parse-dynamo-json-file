@@ -1,0 +1,16 @@
+const program = require('commander');
+const parseJson = require('../lib/parse_backup_json');
+
+program
+  .version('0.0.1')
+  .option('-i, --input [file]', 'Input File')
+  .option('-o, --output [file]', 'Output File')
+  .parse(process.argv);
+
+if (!(program.input && program.output)) {
+  console.log('Usage: parse-dynamo-json-file -i [inputFile] -o [outputFile]');
+  process.exit(1);
+}
+
+parseJson(program.input, program.output);
+
