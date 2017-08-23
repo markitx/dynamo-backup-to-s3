@@ -1,14 +1,15 @@
 {
-  "name": "dynamo-backup-to-s3",
-  "version": "0.6.1",
+  "name": "dr-dynamo",
+  "version": "1.0.0",
   "author": "Dylan Lingelbach (https://github.com/dylanlingelbach)",
   "license": "MIT",
   "contributors": [
-    "Steven de Salas (https://github.com/sdesalas)"
+    "Steven de Salas (https://github.com/sdesalas)",
+    "Rahman Mousavian (https://github.com/mousavian)"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/markitx/dynamo-backup-to-s3.git"
+    "url": "https://github.com/mousavian/dr-dynamo.git"
   },
   "keywords": [
     "dynamo",
@@ -16,7 +17,9 @@
     "backup",
     "streaming",
     "s3",
-    "stream"
+    "stream",
+    "disaster",
+    "recovery"
   ],
   "bin": {
     "dynamo-backup-to-s3": "./bin/dynamo-backup-to-s3"
@@ -33,7 +36,7 @@
     "node": ">=0.10.0"
   },
   "bugs": {
-    "url": "https://github.com/markitx/dynamo-backup-to-s3/issues"
+    "url": "https://github.com/mousavian/dr-dynamo/issues"
   },
   "devDependencies": {
     "mocha": "^2.3.4"

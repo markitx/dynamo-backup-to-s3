@@ -38,14 +38,16 @@ Can be run as a command line script or as an npm module.
 var DynamoBackup = require('dynamo-backup-to-s3');
 
 var backup = new DynamoBackup({
+    aws: { /* AWS general configuration options */
+        region: /* AWS region */,
+        accessKeyId: /* AWS access key */,
+        secretAccessKey: /* AWS secret key */
+    },
     excludedTables: ['development-table1', 'development-table2'],
     readPercentage: .5,
     bucket: 'my-backups',
     stopOnFailure: true,
-    base64Binary: true,
-    awsAccessKey: /* AWS access key */,
-    awsSecretKey: /* AWS secret key */,
-    awsRegion: /* AWS region */
+    base64Binary: true
 });
 
 backup.on('error', function(data) {
@@ -74,15 +76,17 @@ backup.backupAllTables(function() {
 
 ```
 var options = {
+    aws: { /* AWS general configuration options */
+        region: /* AWS region */,
+        accessKeyId: /* AWS access key */,
+        secretAccessKey: /* AWS secret key */
+    },
     excludedTables: /* tables to exclude from backup */,
     includedTables: /* only back up these tables */
     readPercentage: /* only consume this much capacity.  expressed as a decimal (i.e. .5 means use 50% of table read capacity).  default: .25 */,
     bucket:         /* bucket to upload the backup to */,
     stopOnFailure:  /* whether or not to continue backing up if a single table fails to back up */,
     saveDataPipelineFormat   /* save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb) */,
-    awsAccessKey:   /* AWS access key */,
-    awsSecretKey:   /* AWS secret key */,
-    awsRegion:   /* AWS region */,
     backupPath:     /* folder to save backups in.  default: 'DynamoDB-backup-YYYY-MM-DD-HH-mm-ss',
     base64Binary:   /* whether or not to base64 encode binary data before saving to JSON */
 };
@@ -146,8 +150,8 @@ __Arguments__
 
 * `tableName` - name of the table to backup
 * `backupPath` - (optional) the path to use for the backup.
-  The iterator is passed a `callback(err)` which must be called once it has 
-  completed. If no error has occurred, the `callback` should be run without 
+  The iterator is passed a `callback(err)` which must be called once it has
+  completed. If no error has occurred, the `callback` should be run without
   arguments or with an explicit `null` argument.
 * `callback(err)` - A callback which is called when the table has finished backing up, or an error occurs
 
@@ -157,13 +161,13 @@ __Arguments__
 
 ## Restore S3 backups back to Dynamo.
 
-`dynamo-restore-from-s3` is a utility that restores backups in S3 back to dynamo. It streams data down from S3 and throttles the download speed to match the rate of batch writes to Dynamo. 
+`dynamo-restore-from-s3` is a utility that restores backups in S3 back to dynamo. It streams data down from S3 and throttles the download speed to match the rate of batch writes to Dynamo.
 
 It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency, this should yield restore speeds of around 15min per GB.
 
 Use `--overwrite` if the table already exists. Otherwise it will attempt to generate table on the fly.
 
-Can be run as a command line script or as an npm module. 
+Can be run as a command line script or as an npm module.
 
 # Command line usage
 
@@ -193,10 +197,10 @@ Can be run as a command line script or as an npm module.
 ```
 
     # Restore over existing table (cmd.exe).
-    > node ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json --overwrite 
+    > node ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json --overwrite
 
     # Restore over existing table (shell).
-    $ ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json --overwrite 
+    $ ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json --overwrite
 
     # Restore over existing table, 1000 concurrent requests. Stop if any batch fails 1000 times.
     $ ./bin/dynamo-restore-from-s3 -t acme-customers -c 1000 -s s3://my-backups/acme-customers.json --overwrite -sf
@@ -204,23 +208,23 @@ Can be run as a command line script or as an npm module.
     # Restore over existing table, 1000 concurrent requests. When finished, set read capacity to 50 and write capacity to 10 (both needed).
     $ ./bin/dynamo-restore-from-s3 -t acme-customers -c 1000 -s s3://my-backups/acme-customers.json --overwrite --readcapacity 50 --writecapacity 10
 
-    # Auto-generate table (determine PK from backup). 
+    # Auto-generate table (determine PK from backup).
     $ ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json
 
     # Auto-generate table with partition and sort key.
-    $ ./bin/dynamo-restore-from-s3 -t acme-orders -s s3://my-backups/acme-orders.json -pk customerId -sk createDate 
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -s s3://my-backups/acme-orders.json -pk customerId -sk createDate
 
     # Auto-generate table, defined PK. Concurrency 2000 (~ 2GB backup).
-    $ ./bin/dynamo-restore-from-s3 -t acme-orders -pk orderId -c 2000 -s s3://my-backups/acme-orders.json 
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -pk orderId -c 2000 -s s3://my-backups/acme-orders.json
 
     # Auto-generate table. 2000 write units during restore. When finished set 50 write units and 100 write units (both needed).
     $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 2000 -s s3://my-backups/acme-orders.json --readcapacity 100 --writecapacity 50
 
     # Auto-generate table. Concurrency 50 (10 MB backup or less).
-    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 50 -s s3://my-backups/acme-orders.json 
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 50 -s s3://my-backups/acme-orders.json
 
     # Auto-generate table. Concurrency 50. Stop process if any batch fails 50 times.
-    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 50 -sf -s s3://my-backups/acme-orders.json 
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 50 -sf -s s3://my-backups/acme-orders.json
 
 ```
 
@@ -232,13 +236,15 @@ Can be run as a command line script or as an npm module.
 var DynamoRestore = require('dynamo-backup-to-s3').Restore;
 
 var restore = new DynamoRestore({
+    aws: {
+        region: 'ap-southeast-1',
+        accessKeyId: 'my-key',
+        secretAccessKey: 'my-secret'
+    },
     source: 's3://my-backups/DynamoDB-backup-2016-09-28-15-36-40/acme-customers-prod.json',
     table: 'acme-customers-dev',
     overwrite: true,
-    concurrency: 200, // for large restores use 1 unit per MB as a rule of thumb (ie 1000 for 1GB restore)
-    awsAccessKey: /* AWS access key */,
-    awsSecretKey: /* AWS secret key */,
-    awsRegion: /* AWS region */
+    concurrency: 200 // for large restores use 1 unit per MB as a rule of thumb (ie 1000 for 1GB restore)
 });
 
 restore.on('error', function(message) {
@@ -264,6 +270,11 @@ restore.run(function() {
 
 ```
 var options = {
+    aws: { /* AWS general configuration options */
+        region: /* AWS region */,
+        accessKeyId: /* AWS access key */,
+        secretAccessKey: /* AWS secret key */
+    },
     source: /* path to json file in s3 bucket, should start with s3://bucketname/... */,
     table: /* name of dynamo table, will be created on the fly unless overwritten */,
     overwrite: /* true/false if table already exits (defaults to false) */
@@ -272,10 +283,7 @@ var options = {
     sortkey: /* name of secondary (sort) key column */ ,
     readcapacity: /* number of read capacity units (when restore finishes) */,
     writecapacity: /* number of write capacity units (when restore finishes) */,
-    stopOnFailure: /* true/false should a single failed batch stop the whole restore job? */,
-    awsAccessKey: /* AWS access key */,
-    awsSecretKey: /* AWS secret key */,
-    awsRegion: /* AWS region */
+    stopOnFailure: /* true/false should a single failed batch stop the whole restore job? */
 };
 
 var restore = new DynamoBackup.Restore(options);
@@ -313,7 +321,7 @@ __Example__
 ```
 restore.on('send-batch', function(batches, requests, streamMeta) {
     console.log('Batch Sent');
-    console.log('Num cached batches: ', batches); 
+    console.log('Num cached batches: ', batches);
     console.log('Num requests in flight: ', requests);
     console.log('Stream metadata:, JSON.stringify(streamMeta));
 });
