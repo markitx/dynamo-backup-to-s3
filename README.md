@@ -99,8 +99,8 @@ Raised when there is an error backing up a table
 __Example__
 ```
 backup.on('error', function(data) {
-    console.log('Error backing up ' + data.tableName);
-    console.log(data.error);
+    console.log('Error backing up ' + data.table);
+    console.log(data.err);
 });
 ```
 
@@ -110,7 +110,7 @@ Raised when the backup of a table is begining
 
 __Example__
 ```
-backup.on('start-backup', function(tableName) {
+backup.on('start-backup', function(tableName, startTime) {
     console.log('Starting to copy table ' + tableName);
 });
 ```
@@ -121,7 +121,7 @@ Raised when the backup of a table is finished
 
 __Example__
 ```
-backup.on('end-backup', function(tableName) {
+backup.on('end-backup', function(tableName,  endTime) {
     console.log('Done copying table ' + tableName);
 });
 ```
