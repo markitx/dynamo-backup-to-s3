@@ -41,7 +41,10 @@ var backup = new DynamoBackup({
     aws: { /* AWS general configuration options */
         region: /* AWS region */,
         accessKeyId: /* AWS access key */,
-        secretAccessKey: /* AWS secret key */
+        secretAccessKey: /* AWS secret key */,
+        objectParams: {
+            /* optional S3 object properties, such as encryption or storage class*/
+        }
     },
     excludedTables: ['development-table1', 'development-table2'],
     readPercentage: .5,
@@ -79,7 +82,10 @@ var options = {
     aws: { /* AWS general configuration options */
         region: /* AWS region */,
         accessKeyId: /* AWS access key */,
-        secretAccessKey: /* AWS secret key */
+        secretAccessKey: /* AWS secret key */,
+        objectParams: {
+            /* optional S3 object properties, such as encryption or storage class*/
+        }
     },
     excludedTables: /* tables to exclude from backup */,
     includedTables: /* only back up these tables */
