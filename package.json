@@ -1,11 +1,12 @@
 {
   "name": "dr-dynamo",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "author": "Dylan Lingelbach (https://github.com/dylanlingelbach)",
   "license": "MIT",
   "contributors": [
     "Steven de Salas (https://github.com/sdesalas)",
-    "Rahman Mousavian (https://github.com/mousavian)"
+    "Rahman Mousavian (https://github.com/mousavian)",
+    "Miguel Duarte (https://github.com/miguelduarte42)"
   ],
   "repository": {
     "type": "git",
