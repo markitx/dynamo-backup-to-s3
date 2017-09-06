@@ -39,7 +39,7 @@ Can be run as a command line script or as an npm module.
 ## Quick Example
 
 ```
-var DynamoBackup = require('dynamo-backup-to-s3');
+var DynamoBackup = require('dynamo-backup-to-s3').Backup;
 
 var backup = new DynamoBackup({
     aws: { /* AWS general configuration options */
