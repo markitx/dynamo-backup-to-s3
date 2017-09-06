@@ -1,6 +1,10 @@
 # dynamo-backup-to-s3
 
-![dynamo to s3](https://raw.githubusercontent.com/sdesalas/dynamo-backup-to-s3/master/img/dynamo-backup-to-s3.png)
+Note: the code has changed a lot and document is out dated; especially restore part.
+
+A PR would be great if you feel contributing today.
+
+![dynamo to s3](https://raw.githubusercontent.com/mousavian/dynamo-backup-to-s3/master/img/dynamo-backup-to-s3.png)
 
 ## Stream DynamoDB backups to S3.
 
