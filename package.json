@@ -1,6 +1,6 @@
 {
   "name": "dynamo-backup-to-s3",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "author": "Dylan Lingelbach (https://github.com/dylanlingelbach)",
   "license": "MIT",
   "contributors": [

@@ -19,6 +19,7 @@ program
     .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
     .usage('[options]')
     .option('-b, --bucket <name>', 'S3 bucket to store backups')
+    .option('-a, --acl <acl>', 'The canned ACL to apply to the object')
     .option('-s, --stop-on-failure', 'specify the reporter to use', parseBool, true)
     .option('-r, --read-percentage <decimal>', 'specific the percentage of Dynamo read capacity to use while backing up. default .25 (25%)', parseFloat, .25)
     .option('-x, --excluded-tables <list>', 'exclude these tables from backup', list)
@@ -26,6 +27,7 @@ program
     .option('-p, --backup-path <name>', 'backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
     .option('-e, --base64-encode-binary', 'encode binary fields in base64 before exporting')
     .option('-d, --save-data-pipeline-format', 'save in format compatible with the AWS Data Pipeline import. Default to false (save as exported by DynamoDb)')
+    .option('--server-side-encryption', 'enable server side encryption on S3. either AES256 or aws:kms (disabled by default)')
     .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
     .option('--aws-region <region>', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
@@ -39,6 +41,7 @@ var dynamoBackup = new DynamoBackup({
     awsAccessKey: program.awsKey,
     awsSecretKey: program.awsSecret,
     awsRegion: program.awsRegion,
+    acl: program.acl,
     backupPath: program.backupPath,
     bucket: program.bucket,
     excludedTables: program.excludedTables,
@@ -46,7 +49,8 @@ var dynamoBackup = new DynamoBackup({
     readPercentage: program.readPercentage,
     stopOnFailure: program.stopOnFailure,
     base64Binary: program.base64EncodeBinary,
-    saveDataPipelineFormat: program.saveDataPipelineFormat
+    saveDataPipelineFormat: program.saveDataPipelineFormat,
+    serverSideEncryption: program.serverSideEncryption,
 });
 
 dynamoBackup.on('error', function(data) {

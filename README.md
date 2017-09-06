@@ -18,6 +18,14 @@ Can be run as a command line script or as an npm module.
     -h, --help                       output usage information
     -V, --version                    output the version number
     -b, --bucket <name>              S3 bucket to store backups
+    -a, --acl <acl>                  The canned ACL to apply to the object. One of
+                                     - private
+                                     - public-read
+                                     - public-read-write
+                                     - authenticated-read
+                                     - aws-exec-read
+                                     - bucket-owner-read
+                                     - bucket-owner-full-control
     -s, --stop-on-failure            specify the reporter to use
     -r, --read-percentage <decimal>  specific the percentage of Dynamo read capacity to use while backing up. default .25 (25%)
     -x, --excluded-tables <list>     exclude these tables from backup
@@ -25,6 +33,7 @@ Can be run as a command line script or as an npm module.
     -p, --backup-path <name>         backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss
     -e, --base64-encode-binary       if passed, encode binary fields in base64 before exporting
     -d, --save-datapipeline-format   save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb)
+    --server-side-encryption         enable server side encryption on S3. either AES256 or aws:kms (disabled by default)
     --aws-key                        AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret                     AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region                     AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
@@ -43,9 +52,9 @@ var backup = new DynamoBackup({
     bucket: 'my-backups',
     stopOnFailure: true,
     base64Binary: true,
-    awsAccessKey: /* AWS access key */,
-    awsSecretKey: /* AWS secret key */,
-    awsRegion: /* AWS region */
+    awsAccessKey: , // AWS access key
+    awsSecretKey: , // AWS secret key
+    awsRegion:    , // AWS region
 });
 
 backup.on('error', function(data) {
@@ -74,17 +83,19 @@ backup.backupAllTables(function() {
 
 ```
 var options = {
-    excludedTables: /* tables to exclude from backup */,
-    includedTables: /* only back up these tables */
-    readPercentage: /* only consume this much capacity.  expressed as a decimal (i.e. .5 means use 50% of table read capacity).  default: .25 */,
-    bucket:         /* bucket to upload the backup to */,
-    stopOnFailure:  /* whether or not to continue backing up if a single table fails to back up */,
-    saveDataPipelineFormat   /* save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb) */,
-    awsAccessKey:   /* AWS access key */,
-    awsSecretKey:   /* AWS secret key */,
-    awsRegion:   /* AWS region */,
-    backupPath:     /* folder to save backups in.  default: 'DynamoDB-backup-YYYY-MM-DD-HH-mm-ss',
-    base64Binary:   /* whether or not to base64 encode binary data before saving to JSON */
+    excludedTables:         , // tables to exclude from backup
+    includedTables:         , // only back up these tables
+    readPercentage:         , // only consume this much capacity.  expressed as a decimal (i.e. .5 means use 50% of table read capacity).  default: .25
+    bucket:                 , // bucket to upload the backup to
+    stopOnFailure:          , // whether or not to continue backing up if a single table fails to back up
+    saveDataPipelineFormat: , // save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb)
+    awsAccessKey:           , // AWS access key
+    awsSecretKey:           , // AWS secret key
+    awsRegion:              , // AWS region
+    backupPath:             , // folder to save backups in.  default: 'DynamoDB-backup-YYYY-MM-DD-HH-mm-ss'
+    base64Binary:           , // whether or not to base64 encode binary data before saving to JSON
+    acl:                    , // The canned ACL to apply to the object.
+    serverSideEncryption:   , // enable server side encryption on S3. either AES256 or aws:kms (disabled by default)
 };
 
 var backup = new DynamoBackup(options);
@@ -183,6 +194,7 @@ Can be run as a command line script or as an npm module.
     -rc, --readcapacity <units>       Read Units for new table (when finished). Default is 5.
     -wc, --writecapacity <units>      Write Units for new table (when finished). Default is --concurrency.
     -sf, --stop-on-failure            Stop process when the same batch fails to restore multiple times. Defaults to false.
+    --server-side-encryption          enable server side encryption on S3. either AES256 or aws:kms (disabled by default)
     --aws-key <key>                   AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret <secret>             AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region <region>             AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
@@ -236,9 +248,9 @@ var restore = new DynamoRestore({
     table: 'acme-customers-dev',
     overwrite: true,
     concurrency: 200, // for large restores use 1 unit per MB as a rule of thumb (ie 1000 for 1GB restore)
-    awsAccessKey: /* AWS access key */,
-    awsSecretKey: /* AWS secret key */,
-    awsRegion: /* AWS region */
+    awsAccessKey:   , // AWS access key
+    awsSecretKey:   , // AWS secret key
+    awsRegion:      , // AWS region
 });
 
 restore.on('error', function(message) {
@@ -264,18 +276,19 @@ restore.run(function() {
 
 ```
 var options = {
-    source: /* path to json file in s3 bucket, should start with s3://bucketname/... */,
-    table: /* name of dynamo table, will be created on the fly unless overwritten */,
-    overwrite: /* true/false if table already exits (defaults to false) */
-    concurrency: /* number of concurrent requests (and dynamo write capacity units) */,
-    partitionkey: /* name of partition key column */,
-    sortkey: /* name of secondary (sort) key column */ ,
-    readcapacity: /* number of read capacity units (when restore finishes) */,
-    writecapacity: /* number of write capacity units (when restore finishes) */,
-    stopOnFailure: /* true/false should a single failed batch stop the whole restore job? */,
-    awsAccessKey: /* AWS access key */,
-    awsSecretKey: /* AWS secret key */,
-    awsRegion: /* AWS region */
+    source:               , // path to json file in s3 bucket, should start with s3://bucketname/...
+    table:                , // name of dynamo table, will be created on the fly unless overwritten
+    overwrite:            , // true/false if table already exits (defaults to false)
+    concurrency:          , // number of concurrent requests (and dynamo write capacity units)
+    partitionkey:         , // name of partition key column
+    sortkey:              , // name of secondary (sort) key column
+    readcapacity:         , // number of read capacity units (when restore finishes)
+    writecapacity:        , // number of write capacity units (when restore finishes)
+    stopOnFailure:        , // true/false should a single failed batch stop the whole restore job?
+    awsAccessKey:         , // AWS access key
+    awsSecretKey:         , // AWS secret key
+    awsRegion:            , // AWS region
+    serverSideEncryption: , // enable server side encryption on S3. either AES256 or aws:kms (disabled by default)
 };
 
 var restore = new DynamoBackup.Restore(options);

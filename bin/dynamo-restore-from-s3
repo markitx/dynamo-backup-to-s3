@@ -16,6 +16,7 @@ program
     .option('-rc, --readcapacity <units>', 'Read Units for new table (when finished). Default is 5.')
     .option('-wc, --writecapacity <units>', 'Write Units for new table (when finished). Default is --concurrency.')
     .option('-sf, --stop-on-failure', 'Stop process when the same batch fails to restore 3 times. Defaults to false.', true)
+    .option('--server-side-encryption', 'enable server side encryption on S3. either AES256 or aws:kms (disabled by default)')
     .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
     .option('--aws-region <region>', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
@@ -40,6 +41,7 @@ var dynamoRestore = new DynamoRestore({
     overwrite: !!program.overwrite,
     concurrency: program.concurrency,
     stopOnFailure: !!program.stopOnFailure,
+    serverSideEncryption: program.serverSideEncryption,
     // New table properties
     partitionkey: program.partitionkey,
     sortkey: program.sortkey,
