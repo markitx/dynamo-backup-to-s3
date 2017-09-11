@@ -21,7 +21,8 @@ program
     .option('-b, --bucket <name>', 'S3 bucket to store backups')
     .option('-s, --stop-on-failure', 'specify the reporter to use', parseBool, true)
     .option('-r, --read-percentage <decimal>', 'specific the percentage of Dynamo read capacity to use while backing up. default .25 (25%)', parseFloat, .25)
-    .option('-c, --concurrency <units>', 'change read capacity before backup', parseInt)
+    .option('-c, --read-capacity <units>', 'change read capacity during backup. default 0 (no change)', parseInt)
+    .option('-P, --parallel <int>', 'number of parallel reads. This multiplies <read-percentage>; useful to exceed the 1 MB/read limit', parseInt)
     .option('-x, --excluded-tables <list>', 'exclude these tables from backup', list)
     .option('-i, --included-tables <list>', 'only backup these tables', list)
     .option('-p, --backup-path <name>', 'backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
@@ -45,7 +46,8 @@ var dynamoBackup = new DynamoBackup({
     excludedTables: program.excludedTables,
     includedTables: program.includedTables,
     readPercentage: program.readPercentage,
-    concurrency: program.concurrency,
+    readCapacity: program.readCapacity,
+    parallel: program.parallel,
     stopOnFailure: program.stopOnFailure,
     base64Binary: program.base64EncodeBinary,
     saveDataPipelineFormat: program.saveDataPipelineFormat
