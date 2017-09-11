@@ -21,6 +21,7 @@ program
     .option('-b, --bucket <name>', 'S3 bucket to store backups')
     .option('-s, --stop-on-failure', 'specify the reporter to use', parseBool, true)
     .option('-r, --read-percentage <decimal>', 'specific the percentage of Dynamo read capacity to use while backing up. default .25 (25%)', parseFloat, .25)
+    .option('-c, --concurrency <units>', 'change read capacity before backup', parseInt)
     .option('-x, --excluded-tables <list>', 'exclude these tables from backup', list)
     .option('-i, --included-tables <list>', 'only backup these tables', list)
     .option('-p, --backup-path <name>', 'backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
@@ -44,6 +45,7 @@ var dynamoBackup = new DynamoBackup({
     excludedTables: program.excludedTables,
     includedTables: program.includedTables,
     readPercentage: program.readPercentage,
+    concurrency: program.concurrency,
     stopOnFailure: program.stopOnFailure,
     base64Binary: program.base64EncodeBinary,
     saveDataPipelineFormat: program.saveDataPipelineFormat
@@ -51,7 +53,7 @@ var dynamoBackup = new DynamoBackup({
 
 dynamoBackup.on('error', function(data) {
     console.log('Error backing up ' + data.tableName);
-    console.log(data.error);
+    console.log(data.error.message);
     if (program.stopOnFailure) {
         process.exit(-1);
     }
