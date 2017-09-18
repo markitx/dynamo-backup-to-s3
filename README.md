@@ -20,6 +20,8 @@ Can be run as a command line script or as an npm module.
     -b, --bucket <name>              S3 bucket to store backups
     -s, --stop-on-failure            specify the reporter to use
     -r, --read-percentage <decimal>  specific the percentage of Dynamo read capacity to use while backing up. default .25 (25%)
+    -c, --read-capacity <units>      change read capacity during backup. default 0 (no change)
+    -P, --parallel <number>          number of parallel reads. This multiplies <read-percentage>; useful to exceed the 1 MB/request limit
     -x, --excluded-tables <list>     exclude these tables from backup
     -i, --included-tables <list>     only backup these tables
     -p, --backup-path <name>         backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss
@@ -146,8 +148,8 @@ __Arguments__
 
 * `tableName` - name of the table to backup
 * `backupPath` - (optional) the path to use for the backup.
-  The iterator is passed a `callback(err)` which must be called once it has 
-  completed. If no error has occurred, the `callback` should be run without 
+  The iterator is passed a `callback(err)` which must be called once it has
+  completed. If no error has occurred, the `callback` should be run without
   arguments or with an explicit `null` argument.
 * `callback(err)` - A callback which is called when the table has finished backing up, or an error occurs
 
@@ -157,13 +159,13 @@ __Arguments__
 
 ## Restore S3 backups back to Dynamo.
 
-`dynamo-restore-from-s3` is a utility that restores backups in S3 back to dynamo. It streams data down from S3 and throttles the download speed to match the rate of batch writes to Dynamo. 
+`dynamo-restore-from-s3` is a utility that restores backups in S3 back to dynamo. It streams data down from S3 and throttles the download speed to match the rate of batch writes to Dynamo.
 
 It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency, this should yield restore speeds of around 15min per GB.
 
 Use `--overwrite` if the table already exists. Otherwise it will attempt to generate table on the fly.
 
-Can be run as a command line script or as an npm module. 
+Can be run as a command line script or as an npm module.
 
 # Command line usage
 
@@ -193,10 +195,10 @@ Can be run as a command line script or as an npm module.
 ```
 
     # Restore over existing table (cmd.exe).
-    > node ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json --overwrite 
+    > node ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json --overwrite
 
     # Restore over existing table (shell).
-    $ ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json --overwrite 
+    $ ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json --overwrite
 
     # Restore over existing table, 1000 concurrent requests. Stop if any batch fails 1000 times.
     $ ./bin/dynamo-restore-from-s3 -t acme-customers -c 1000 -s s3://my-backups/acme-customers.json --overwrite -sf
@@ -204,23 +206,23 @@ Can be run as a command line script or as an npm module.
     # Restore over existing table, 1000 concurrent requests. When finished, set read capacity to 50 and write capacity to 10 (both needed).
     $ ./bin/dynamo-restore-from-s3 -t acme-customers -c 1000 -s s3://my-backups/acme-customers.json --overwrite --readcapacity 50 --writecapacity 10
 
-    # Auto-generate table (determine PK from backup). 
+    # Auto-generate table (determine PK from backup).
     $ ./bin/dynamo-restore-from-s3 -t acme-customers -s s3://my-backups/acme-customers.json
 
     # Auto-generate table with partition and sort key.
-    $ ./bin/dynamo-restore-from-s3 -t acme-orders -s s3://my-backups/acme-orders.json -pk customerId -sk createDate 
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -s s3://my-backups/acme-orders.json -pk customerId -sk createDate
 
     # Auto-generate table, defined PK. Concurrency 2000 (~ 2GB backup).
-    $ ./bin/dynamo-restore-from-s3 -t acme-orders -pk orderId -c 2000 -s s3://my-backups/acme-orders.json 
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -pk orderId -c 2000 -s s3://my-backups/acme-orders.json
 
     # Auto-generate table. 2000 write units during restore. When finished set 50 write units and 100 write units (both needed).
     $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 2000 -s s3://my-backups/acme-orders.json --readcapacity 100 --writecapacity 50
 
     # Auto-generate table. Concurrency 50 (10 MB backup or less).
-    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 50 -s s3://my-backups/acme-orders.json 
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 50 -s s3://my-backups/acme-orders.json
 
     # Auto-generate table. Concurrency 50. Stop process if any batch fails 50 times.
-    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 50 -sf -s s3://my-backups/acme-orders.json 
+    $ ./bin/dynamo-restore-from-s3 -t acme-orders -c 50 -sf -s s3://my-backups/acme-orders.json
 
 ```
 
@@ -313,7 +315,7 @@ __Example__
 ```
 restore.on('send-batch', function(batches, requests, streamMeta) {
     console.log('Batch Sent');
-    console.log('Num cached batches: ', batches); 
+    console.log('Num cached batches: ', batches);
     console.log('Num requests in flight: ', requests);
     console.log('Stream metadata:, JSON.stringify(streamMeta));
 });
