@@ -28,7 +28,8 @@
     "lodash": "^3.10.1",
     "moment": "^2.10.6",
     "moment-range": "^2.0.3",
-    "s3-streaming-upload": "^0.2.1"
+    "s3-streaming-upload": "^0.2.1",
+    "s3-streams": "^0.3.0"
   },
   "engines": {
     "node": ">=0.10.0"

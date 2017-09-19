@@ -15,12 +15,18 @@ function parseBool(val) {
     return val == 'true';
 }
 
+function parseLast(val, _) {
+    return parseInt(val);
+}
+
 program
     .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
     .usage('[options]')
     .option('-b, --bucket <name>', 'S3 bucket to store backups')
     .option('-s, --stop-on-failure', 'specify the reporter to use', parseBool, true)
     .option('-r, --read-percentage <decimal>', 'specific the percentage of Dynamo read capacity to use while backing up. default .25 (25%)', parseFloat, .25)
+    .option('-c, --read-capacity <units>', 'change read capacity during backup. default 0 (no change)', parseLast, 0)
+    .option('-P, --parallel <int>', 'number of parallel reads. This multiplies <read-percentage>; useful to exceed the 1 MB/read limit', parseInt)
     .option('-x, --excluded-tables <list>', 'exclude these tables from backup', list)
     .option('-i, --included-tables <list>', 'only backup these tables', list)
     .option('-p, --backup-path <name>', 'backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss')
@@ -32,6 +38,8 @@ program
     .parse(process.argv);
 
 // run program
+console.log(program.readCapacity);
+process.exit(0)
 
 var runTimes = {};
 
@@ -44,6 +52,8 @@ var dynamoBackup = new DynamoBackup({
     excludedTables: program.excludedTables,
     includedTables: program.includedTables,
     readPercentage: program.readPercentage,
+    readCapacity: program.readCapacity,
+    parallel: program.parallel,
     stopOnFailure: program.stopOnFailure,
     base64Binary: program.base64EncodeBinary,
     saveDataPipelineFormat: program.saveDataPipelineFormat
@@ -51,7 +61,7 @@ var dynamoBackup = new DynamoBackup({
 
 dynamoBackup.on('error', function(data) {
     console.log('Error backing up ' + data.tableName);
-    console.log(data.error);
+    console.log(data.error.message);
     if (program.stopOnFailure) {
         process.exit(-1);
     }
