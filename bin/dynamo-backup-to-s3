@@ -15,13 +15,17 @@ function parseBool(val) {
     return val == 'true';
 }
 
+function parseLast(val, _) {
+    return parseInt(val);
+}
+
 program
     .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
     .usage('[options]')
     .option('-b, --bucket <name>', 'S3 bucket to store backups')
     .option('-s, --stop-on-failure', 'specify the reporter to use', parseBool, true)
     .option('-r, --read-percentage <decimal>', 'specific the percentage of Dynamo read capacity to use while backing up. default .25 (25%)', parseFloat, .25)
-    .option('-c, --read-capacity <units>', 'change read capacity during backup. default 0 (no change)', parseInt)
+    .option('-c, --read-capacity <units>', 'change read capacity during backup. default 0 (no change)', parseLast, 0)
     .option('-P, --parallel <int>', 'number of parallel reads. This multiplies <read-percentage>; useful to exceed the 1 MB/read limit', parseInt)
     .option('-x, --excluded-tables <list>', 'exclude these tables from backup', list)
     .option('-i, --included-tables <list>', 'only backup these tables', list)
@@ -34,6 +38,8 @@ program
     .parse(process.argv);
 
 // run program
+console.log(program.readCapacity);
+process.exit(0)
 
 var runTimes = {};
 
