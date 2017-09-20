@@ -76,7 +76,7 @@ dynamoRestore.on('start-download', function(streamMeta) {
 });
 
 dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
-    console.log('Batch sent. %d in flight. %s remaining to download...', requests, translate(streamMeta.RemainingLength));
+    console.log('Batch sent. %d/%d in flight. %s remaining to download...', requests, batches, translate(streamMeta.RemainingLength));
 });
 
 // Start Process
