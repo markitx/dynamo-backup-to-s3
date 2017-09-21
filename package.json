@@ -16,7 +16,7 @@
     "backup",
     "streaming",
     "s3",
-    "stream",
+    "stream"
   ],
   "bin": {
     "dynamo-backup-to-s3": "./bin/dynamo-backup-to-s3"
@@ -28,7 +28,7 @@
     "lodash": "^3.10.1",
     "moment": "^2.10.6",
     "moment-range": "^2.0.3",
-    "s3-streaming-upload": "^0.2.1",
+    "s3-streaming-upload": "^0.2.1"
   },
   "engines": {
     "node": ">=0.10.0"
