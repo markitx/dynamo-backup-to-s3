@@ -55,9 +55,9 @@ function translate(contentLength) {
     var kb = contentLength / 1024,
         mb = kb / 1024,
         gb = mb / 1024;
-    return gb > 5 ? gb.toFixed(0) + ' Gb' :
-        (mb > 5 ? mb.toFixed(0) + 'Mb' :
-        kb.toFixed(0) + 'Kb');
+    return gb > 5 ? gb.toFixed(1) + ' GiB' :
+        (mb > 5 ? mb.toFixed(1) + 'MiB' :
+        kb.toFixed(0) + 'KiB');
 }
 
 // Define events
@@ -75,8 +75,8 @@ dynamoRestore.on('start-download', function(streamMeta) {
     console.log('Starting download. %s remaining...', translate(streamMeta.ContentLength));
 });
 
-dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
-    console.log('Batch sent. %d/%d in flight. %s remaining to download...', requests, batches, translate(streamMeta.RemainingLength));
+dynamoRestore.on('send-batch', function(batches, queue, streamMeta) {
+    console.log('%d batches in flight. %d items in queue. %s remaining to download...', batches, queue, translate(streamMeta.RemainingLength));
 });
 
 // Start Process
