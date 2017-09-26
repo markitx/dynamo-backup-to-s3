@@ -1,14 +1,15 @@
 {
   "name": "dynamo-backup-to-s3",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "author": "Dylan Lingelbach (https://github.com/dylanlingelbach)",
   "license": "MIT",
   "contributors": [
-    "Steven de Salas (https://github.com/sdesalas)"
+    "Steven de Salas (https://github.com/sdesalas)",
+    "Matt Geskey (https://github.com/vitrvvivs)"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/markitx/dynamo-backup-to-s3.git"
+    "url": "https://github.com/celtra/dynamo-backup-to-s3.git"
   },
   "keywords": [
     "dynamo",
@@ -19,7 +20,8 @@
     "stream"
   ],
   "bin": {
-    "dynamo-backup-to-s3": "./bin/dynamo-backup-to-s3"
+    "dynamo-backup-to-s3": "./bin/dynamo-backup-to-s3",
+    "dynamo-restore-from-s3": "./bin/dynamo-restore-from-s3"
   },
   "dependencies": {
     "async": "^1.5.0",
@@ -34,7 +36,7 @@
     "node": ">=0.10.0"
   },
   "bugs": {
-    "url": "https://github.com/markitx/dynamo-backup-to-s3/issues"
+    "url": "https://github.com/celtra/dynamo-backup-to-s3/issues"
   },
   "devDependencies": {
     "mocha": "^2.3.4"
