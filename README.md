@@ -25,6 +25,7 @@ Can be run as a command line script or as an npm module.
     -p, --backup-path <name>         backup path to store table dumps in. default is DynamoDB-backup-YYYY-MM-DD-HH-mm-ss
     -e, --base64-encode-binary       if passed, encode binary fields in base64 before exporting
     -d, --save-datapipeline-format   save in format compatible with the AWS datapipeline import. Default to false (save as exported by DynamoDb)
+    -f, --save-schema                save table schema. Default to true
     --aws-key                        AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret                     AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region                     AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
@@ -161,7 +162,7 @@ __Arguments__
 
 It is suitable for restoring large tables without needing to write to disk or use a large amount of memory. Use it on an AWS EC2 instance for best results and to minimise network latency, this should yield restore speeds of around 15min per GB.
 
-Use `--overwrite` if the table already exists. Otherwise it will attempt to generate table on the fly.
+Use `--overwrite` if the table already exists. Otherwise it will attempt to generate table on the fly using table.schema.json created on the backup.
 
 Can be run as a command line script or as an npm module. 
 

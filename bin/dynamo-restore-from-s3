@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-
+var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/T1JC01J20/B56R0998F/' + process.env.SLACK_ID;
+var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 var program = require('commander'),
     fs = require('fs'),
     DynamoRestore = require('../').Restore;
@@ -11,6 +12,7 @@ program
     .option('-t, --table [name]', 'Name of the Dynamo Table to restore to (Required)')
     .option('-o, --overwrite', 'Table already exists, skip auto-create. Default is false.')
     .option('-c, --concurrency <requestcount>', 'Number of concurrent requests & dynamo capacity units. Defaults to 200.')
+    .option('-ic, --index-concurrency <requestcount>', 'Number of concurrent requests & dynamo capacity units for global secondary indexes. Defaults to 200.')
     .option('-pk, --partitionkey [columnname]', 'Name of Primary Partition Key. If not provided will try determine from backup.')
     .option('-sk, --sortkey [columnname]', 'Name of Secondary Sort Key. Ignored unless --partitionkey is provided.')
     .option('-rc, --readcapacity <units>', 'Read Units for new table (when finished). Default is 5.')
@@ -39,6 +41,7 @@ var dynamoRestore = new DynamoRestore({
     table: program.table,
     overwrite: !!program.overwrite,
     concurrency: program.concurrency,
+    indexConcurrency: program.indexConcurrency,
     stopOnFailure: !!program.stopOnFailure,
     // New table properties
     partitionkey: program.partitionkey,
@@ -62,8 +65,16 @@ function translate(contentLength) {
 
 // Define events
 dynamoRestore.on('error', function(message) {
+    slack.note({
+        channel: '#ped_backup_restore',
+        text: 'Something went wrong restoring: ' + program.table,
+        fields: {
+            'Error': message,
+        },
+        username: 'Pato'
+    });
     console.log(message);
-    process.exit(-1);
+    setTimeout(function() { process.exit(-1); }, 3000);
 });
 
 dynamoRestore.on('warning', function(message) {
@@ -71,11 +82,17 @@ dynamoRestore.on('warning', function(message) {
 });
 
 dynamoRestore.on('start-download', function(streamMeta) {
+    slack.note({
+        channel: '#ped_backup_restore',
+        text: 'Restoring ' + program.table + '. Write capacity set to: ' +  program.concurrency,
+        username: 'Pato'
+    });
     var time = runTimes.startDownload = new Date().getTime();
     console.log('Starting download. %s remaining...', translate(streamMeta.ContentLength));
 });
 
 dynamoRestore.on('send-batch', function(batches, requests, streamMeta) {
+    return;
     console.log('Batch sent. %d in flight. %s remaining to download...', requests, translate(streamMeta.RemainingLength));
 });
 
@@ -85,6 +102,12 @@ dynamoRestore.run(function() {
         diff = time - runTimes.start,
         minutes = Math.floor(diff / (1000 * 60)),
         seconds = Math.floor((diff % 1000 * 60) / 1000);
+
+    slack.note({
+        channel: '#ped_backup_restore',
+        text: 'Restore completed for ' + program.table + ' in ' + minutes + ' minutes ' + seconds + ' seconds. Write capacity: ' +  program.writecapacity + ', Read capacity: ' + program.writecapacity,
+        username: 'Pato'
+    });
     console.log('Done! Process completed in %s minutes %s seconds.', minutes, seconds);
-    process.exit(0);
+    setTimeout(function() { process.exit(0); }, 3000);
 });
