@@ -45,10 +45,12 @@ var dynamoRestore = new DynamoRestore({
     sortkey: program.sortkey,
     readcapacity: program.readcapacity,
     writecapacity: program.writecapacity,
-    // Authentication
-    awsKey: program.awsKey,
-    awsSecret: program.awsSecret,
-    awsRegion: program.awsRegion,
+    // AWS config
+    aws: {
+        region: program.awsRegion,
+        accessKeyId: program.awsKey,
+        secretAccessKey: program.awsSecret
+    },
 });
 
 function translate(contentLength) {
