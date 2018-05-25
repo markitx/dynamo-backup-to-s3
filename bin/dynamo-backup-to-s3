@@ -36,9 +36,11 @@ program
 var runTimes = {};
 
 var dynamoBackup = new DynamoBackup({
-    awsAccessKey: program.awsKey,
-    awsSecretKey: program.awsSecret,
-    awsRegion: program.awsRegion,
+    aws: {
+        region: program.awsRegion,
+        accessKeyId: program.awsKey,
+        secretAccessKey: program.awsSecret
+    },
     backupPath: program.backupPath,
     bucket: program.bucket,
     excludedTables: program.excludedTables,
