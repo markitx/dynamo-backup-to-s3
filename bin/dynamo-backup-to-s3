@@ -29,7 +29,8 @@ program
     .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
     .option('--aws-region <region>', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
-    .option('--strip-fields <list>', 'Won't include fields in the bakup', list)
+    .option('--strip-fields <list>', 'exclue these fields in the bakup', list)
+    .option('-g, --global-table', 'specify if global table, will strip aws fields from backup')
     .parse(process.argv);
 
 // run program
@@ -48,6 +49,7 @@ var dynamoBackup = new DynamoBackup({
     stopOnFailure: program.stopOnFailure,
     base64Binary: program.base64EncodeBinary,
     stripFields: program.stripFields,
+    globalTable: program.globalTable,
     saveDataPipelineFormat: program.saveDataPipelineFormat
 });
 
