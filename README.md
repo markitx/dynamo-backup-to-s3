@@ -28,6 +28,7 @@ Can be run as a command line script or as an npm module.
     --aws-key                        AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret                     AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region                     AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
+	--session-token					 AWS session token. Used when assuming role. Will use AWS_SESSION_TOKEN env var if --session-token not set
 ```
 
 # npm module usage
