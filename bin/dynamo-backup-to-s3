@@ -70,7 +70,11 @@ dynamoBackup.on('end-backup', function(tableName) {
     console.log('Done copying table ' + tableName + '. Took ' + endTime.diff(startTime, 'minutes', true).toFixed(2) + ' minutes');
 });
 
-dynamoBackup.backupAllTables(function() {
+dynamoBackup.backupAllTables(function(error) {
+    if (error) {
+      console.error('Error:', error.message);
+      process.exit(1);
+    }
     console.log('Finished backing up DynamoDB');
     process.exit(0);
 });
