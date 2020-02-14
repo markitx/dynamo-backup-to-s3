@@ -8,7 +8,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/markitx/dynamo-backup-to-s3.git"
+    "url": "git+https://github.com/markitx/dynamo-backup-to-s3.git"
   },
   "keywords": [
     "dynamo",
@@ -19,7 +19,8 @@
     "stream"
   ],
   "bin": {
-    "dynamo-backup-to-s3": "./bin/dynamo-backup-to-s3"
+    "dynamo-backup-to-s3": "bin/dynamo-backup-to-s3",
+    "dynamo-restore-from-s3": "bin/dynamo-restore-from-s3"
   },
   "dependencies": {
     "async": "^1.5.0",
@@ -37,9 +38,15 @@
     "url": "https://github.com/markitx/dynamo-backup-to-s3/issues"
   },
   "devDependencies": {
-    "mocha": "^2.3.4"
+    "mocha": "^7.0.1"
   },
   "scripts": {
     "test": "NODE_ENV=test mocha --timeout 120000"
+  },
+  "description": "![dynamo to s3](https://raw.githubusercontent.com/sdesalas/dynamo-backup-to-s3/master/img/dynamo-backup-to-s3.png)",
+  "homepage": "https://github.com/markitx/dynamo-backup-to-s3#readme",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
   }
 }
