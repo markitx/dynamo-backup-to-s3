@@ -11,11 +11,12 @@ program
     .option('-t, --table [name]', 'Name of the Dynamo Table to restore to (Required)')
     .option('-o, --overwrite', 'Table already exists, skip auto-create. Default is false.')
     .option('-c, --concurrency <requestcount>', 'Number of concurrent requests & dynamo capacity units. Defaults to 200.')
-    .option('-pk, --partitionkey [columnname]', 'Name of Primary Partition Key. If not provided will try determine from backup.')
-    .option('-sk, --sortkey [columnname]', 'Name of Secondary Sort Key. Ignored unless --partitionkey is provided.')
-    .option('-rc, --readcapacity <units>', 'Read Units for new table (when finished). Default is 5.')
-    .option('-wc, --writecapacity <units>', 'Write Units for new table (when finished). Default is --concurrency.')
-    .option('-sf, --stop-on-failure', 'Stop process when the same batch fails to restore 3 times. Defaults to false.', true)
+    .option('-p, --partitionkey [columnname]', 'Name of Primary Partition Key. If not provided will try determine from backup.')
+    .option('-k, --sortkey [columnname]', 'Name of Secondary Sort Key. Ignored unless --partitionkey is provided.')
+    .option('-r, --readcapacity <units>', 'Read Units for new table (when finished). Default is 5.')
+    .option('-w, --writecapacity <units>', 'Write Units for new table (when finished). Default is --concurrency.')
+    .option('-d, --on-demand-table', 'If table is created, use On-Demand capacity mode. Default is false.', false)
+    .option('-f, --stop-on-failure', 'Stop process when the same batch fails to restore 3 times. Defaults to false.', false)
     .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
     .option('--aws-session-token <token>', 'AWS session token - optional, use if working with temporary credentials. Will use AWS_SESSION_TOKEN env var if --aws-session-token not set')
@@ -46,6 +47,7 @@ var dynamoRestore = new DynamoRestore({
     sortkey: program.sortkey,
     readcapacity: program.readcapacity,
     writecapacity: program.writecapacity,
+    onDemandTable: program.onDemandTable,
     // Authentication
     awsKey: program.awsKey,
     awsSecret: program.awsSecret,
