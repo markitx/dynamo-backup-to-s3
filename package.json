@@ -25,7 +25,7 @@
     "async": "^1.5.0",
     "aws-sdk": "^2.2.21",
     "commander": "^2.9.0",
-    "lodash": "^3.10.1",
+    "lodash": "^4.17.19",
     "moment": "^2.10.6",
     "moment-range": "^2.0.3",
     "s3-streaming-upload": "^0.2.1"
