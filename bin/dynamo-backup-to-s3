@@ -29,6 +29,7 @@ program
     .option('--aws-key <key>', 'AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set')
     .option('--aws-secret <secret>', 'AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set')
     .option('--aws-region <region>', 'AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set')
+    .option('--aws-session <sessionToken>', 'AWS session Token. Will use AWS_SESSION_TOKEN env var if --aws-session not set')
     .parse(process.argv);
 
 // run program
@@ -39,6 +40,7 @@ var dynamoBackup = new DynamoBackup({
     awsAccessKey: program.awsKey,
     awsSecretKey: program.awsSecret,
     awsRegion: program.awsRegion,
+    awsSessionToken: program.awsSession,
     backupPath: program.backupPath,
     bucket: program.bucket,
     excludedTables: program.excludedTables,

@@ -28,6 +28,7 @@ Can be run as a command line script or as an npm module.
     --aws-key                        AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret                     AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region                     AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
+    --aws-session <sessionToken>      AWS session Token. Will use AWS_SESSION_TOKEN env var if --aws-session not set
 ```
 
 # npm module usage
@@ -46,6 +47,7 @@ var backup = new DynamoBackup({
     awsAccessKey: /* AWS access key */,
     awsSecretKey: /* AWS secret key */,
     awsRegion: /* AWS region */
+    awsSessionToken: /* AWS Session Token */
 });
 
 backup.on('error', function(data) {
@@ -83,6 +85,7 @@ var options = {
     awsAccessKey:   /* AWS access key */,
     awsSecretKey:   /* AWS secret key */,
     awsRegion:   /* AWS region */,
+    awsSessionToken:   /* AWS Session Token */,
     backupPath:     /* folder to save backups in.  default: 'DynamoDB-backup-YYYY-MM-DD-HH-mm-ss',
     base64Binary:   /* whether or not to base64 encode binary data before saving to JSON */
 };
@@ -186,6 +189,7 @@ Can be run as a command line script or as an npm module.
     --aws-key <key>                   AWS access key. Will use AWS_ACCESS_KEY_ID env var if --aws-key not set
     --aws-secret <secret>             AWS secret key. Will use AWS_SECRET_ACCESS_KEY env var if --aws-secret not set
     --aws-region <region>             AWS region. Will use AWS_DEFAULT_REGION env var if --aws-region not set
+    --aws-session <sessionToken>      AWS session Token. Will use AWS_SESSION_TOKEN env var if --aws-session not set
 ```
 
 ## Examples
@@ -238,7 +242,8 @@ var restore = new DynamoRestore({
     concurrency: 200, // for large restores use 1 unit per MB as a rule of thumb (ie 1000 for 1GB restore)
     awsAccessKey: /* AWS access key */,
     awsSecretKey: /* AWS secret key */,
-    awsRegion: /* AWS region */
+    awsRegion: /* AWS region */,
+    awsSessionToken: /* AWS Session Token */
 });
 
 restore.on('error', function(message) {
@@ -275,7 +280,8 @@ var options = {
     stopOnFailure: /* true/false should a single failed batch stop the whole restore job? */,
     awsAccessKey: /* AWS access key */,
     awsSecretKey: /* AWS secret key */,
-    awsRegion: /* AWS region */
+    awsRegion: /* AWS region */,
+    awsSessionToken: /* AWS Session Token */
 };
 
 var restore = new DynamoBackup.Restore(options);
